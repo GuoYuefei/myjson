@@ -33,8 +33,8 @@ type StackAnaly struct {
 	top int
 	//这是一个功能标志
 	//1111,1111 从左往右一次编号01234567
-	//0号，是否在[]中，1：如果是”，“号所期待的下一个值是value，0：如果不是，则期待key。
-	//1号，栈中是否只有奇数个”\"“,1:如果是则期待的是下一个”，0：如果不是，啥也不期待，继承上一个期待
+	//,0号，是否在[]中，1：如果是”，“号所期待的下一个值是value，0：如果不是，则期待key。
+	//"1号，栈中是否只有奇数个”\"“,1:如果是则期待的是下一个”，0：如果不是，啥也不期待，继承上一个期待
 	flag byte
 	//这个栈中存有当前元素应该在对象中还是数组中，实在在什么对象中什么数组中
 	State *Stack
@@ -64,12 +64,30 @@ func (s *StackAnaly) Push(b byte) {
 		s.data[s.top] = b
 	}
 	s.data = append(s.data, b)
+
+	switch s.IsSign().GetStatus() {
+	case StaQuotation:
+		s.flag = s.flag | 0x40
+	case StaSquare:
+		s.flag = s.flag | 0x80
+	}
+
+
 }
 
 func (s *StackAnaly) Pop() byte {
 	if s.IsEmpty() {
 		fmt.Errorf("栈为空！！" )
 		return 0
+	}
+	//必须在top--之前
+	switch s.IsSign().GetStatus() {
+	//引号情况居多，引号放前
+	case StaQuotation:						//如果期待的是引号那么，他就是引号，标志置空
+		s.flag = s.flag & 0xBF			//去掉标志位
+	case StaSquare:						//[出栈的时候将标志置空
+		s.flag = s.flag & 0x7F
+
 	}
 	b := s.data[s.top]
 	s.top-- //只减不删
@@ -101,23 +119,23 @@ type StackAnalyser interface {
 
 //栈的分析接口
 type Analyser interface {
-	//查看刚压入的元素是否是标识符 如果是就返回有值的sign，否则就nil
 	IsSign() *Sign
-	//置位标识符 使用位
 	SetFlag(b byte)
-	//得到标志位
 	GetFlag() byte
 }
 //需要分析出标志符{}[],":七个
 
+//查看刚压入的元素是否是标识符 如果是就返回有值的sign，否则就nil
 func (s *StackAnaly) IsSign() *Sign {
-	return GetSign([]byte{s.Top()})
+	return GetSign([]byte{s.Top()}, s.flag)
 }
 
+//置位标识符 使用位
 func (s *StackAnaly) SetFlag(b byte) {
 	s.flag = b
 }
 
+//得到标志位
 func (s *StackAnaly) GetFlag() byte {
 	return s.flag
 }
@@ -148,7 +166,7 @@ type Stack struct {
 	top int
 	//StackValuer
 	//顶层元素在对象里面还是数组里面
-	//在对象里置true
+	//在对象里置true 数组中就是false
 	obOrAr bool
 }
 

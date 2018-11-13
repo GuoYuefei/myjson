@@ -43,3 +43,20 @@ const (
 //这个是包内全局变量，用于记录“\"”是否被期待，因为这个部分前后，想{}[]是不同字符成对出现的
 //外部禁止访问，这样会导致不安全
 var flagQuo = false
+
+//-----------还可以区分{}[]:," key value
+type WhatsType int
+const (
+	TBracesL WhatsType = iota
+	TBracesR
+	TSquareL
+	TSquareR
+	//引号
+	TQuotation
+	//冒号
+	TColon
+	//逗号
+	TComma
+	TKey			//key
+	TValue			//value
+)
