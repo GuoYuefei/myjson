@@ -84,17 +84,18 @@ func (s *StackAnaly) Pop() byte {
 		fmt.Errorf("栈为空！！" )
 		return 0
 	}
+	//这个"引号的标志位只与push有关
 	//必须在top--之前
-	if s.IsSign() != nil {
-		switch s.IsSign().GetWT() {
-		//引号情况居多，引号放前
-		case TQuotation:						//如果是引号，标志置空
-			s.flag = s.flag ^ 0xBF			//去掉标志位
-			//case TSquareL:						//[出栈的时候将标志置空,------------------------------------->但是如果是两层嵌套呢，这里是一个bug，暂不管
-			//	s.flag = s.flag & 0x7F
-		}
-
-	}
+	//if s.IsSign() != nil {
+	//	switch s.IsSign().GetWT() {
+	//	//引号情况居多，引号放前
+	//	case TQuotation:						//如果是引号，标志置空
+	//		s.flag = s.flag & 0xBF			//去掉标志位
+	//		//case TSquareL:						//[出栈的时候将标志置空,------------------------------------->但是如果是两层嵌套呢，这里是一个bug，暂不管
+	//		//	s.flag = s.flag & 0x7F
+	//	}
+	//
+	//}
 
 	//当s。state中栈顶不是数组了，就置空标志位
 	if s.State.GetOOA() {
@@ -256,6 +257,67 @@ func (s *Stack) Clear() {
 
 func (s *Stack) GetOOA() bool {
 	return s.obOrAr
+}
+
+
+type StackStringer interface {
+	IsEmpty() bool
+	Push(s string)
+	Pop() string
+	Top() string
+	Clear()
+	Size() int
+}
+
+
+//不管了，我在写一个string的栈吧，这样执行速度上将比上面的更加快写
+type StackString struct {
+	data []string
+	top int
+}
+
+func NewStackString() *StackString {
+	return &StackString{make([]string, 0, 7), -1}
+}
+
+func (s *StackString)IsEmpty() bool {
+	if s.top == -1 {
+		return true
+	}
+	return false
+}
+
+func (s *StackString) Push(v string) {
+	s.top++
+	if len(s.data) > s.top {
+		s.data[s.top] = v
+	} else {
+		s.data = append(s.data, v)
+	}
+}
+
+func (s *StackString) Pop() string {
+	if s.IsEmpty() {
+		return ""
+	}
+	v := s.data[s.top]
+	s.top--
+	return v
+}
+
+func (s *StackString) Top() string {
+	if s.IsEmpty() {
+		return ""
+	}
+	return s.data[s.top]
+}
+
+func (s *StackString) Size() int {
+	return s.top + 1
+}
+
+func (s *StackString) Clear() {
+	s.top = -1
 }
 
 

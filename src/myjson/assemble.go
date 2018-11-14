@@ -6,13 +6,15 @@ import "fmt"
 var s *StackAnaly
 var sState *Stack
 var ss *StackAnaly			//辅助栈，出栈的时候倒序
-var keyStr string			//永远只有一个key游离在外面
+var keyStrs *StackString			//永远只有一个key游离在外面
+
+//为什么我感觉还需要一个string的栈啊，一个类型自己写个栈，我都累了，这样重复代码太多了，使用Value类型包装的栈用起来有太麻烦
 
 func init() {
 	sState = NewStack()
 	s = NewStackAnalyByStack(sState)
 	ss = NewStackAnaly()
-	keyStr = ""
+	keyStrs = NewStackString()
 }
 
 //现在我们需要几个函数，通过关键字可以分析出接下来的东西是key还是value，在数组中还是对象中
@@ -30,7 +32,7 @@ func init() {
 //如果读到的是json的关键字{}【】等等就返回true
 //这个函数只负责处理keyWord
 func delChar(b byte) {
-	var sign *Sign = s.IsSign()
+	var sign *Sign
 	//这一部分是分析栈顶元素
 	if !s.IsEmpty() {
 
@@ -77,10 +79,10 @@ func delChar(b byte) {
 			fmt.Println(string([]byte{s.Top()}),s.Size())
 			if s.IsSign().GetWT() == TBracesL {
 				//对象的第一个属性key
-				keyStr = tempStr
+				keyStrs.Push(tempStr)
 			}
 			if s.IsSign().GetWT() == TComma && s.State.GetOOA() {
-				keyStr = tempStr
+				keyStrs.Push(tempStr)
 				s.Pop()			//顺便把，逗号pop出来了
 			}
 
@@ -90,17 +92,20 @@ func delChar(b byte) {
 				//这里是冒号情况下value的情况，需要让：出栈
 				if s.State.GetOOA() {
 					//其实一定在对象里的，冒号是不会在数组里出现的
-					s.State.Top().GetAsObjectIgnore()[keyStr] = NewVal(tempStr)
+					s.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(tempStr)
 				}
 				s.Pop()		//冒号pop出来
-			} else if s.IsSign().GetWT() == TColon && !s.State.GetOOA() {
-				a := s.State.Top().GetAsSliceIgnore()
+			} else if s.IsSign().GetWT() == TComma && !s.State.GetOOA() {
+				//这里Pop出来有Push回去低效率了，以后看到修复
+				a := s.State.Pop().GetAsSliceIgnore()
 				a = append(a, NewVal(tempStr))
+				s.State.Push(NewVal(a))
 				s.Pop()			//逗号pop出来
 			} else if s.IsSign().GetWT() == TSquareL {
 				//数组的第一个元素
-				a := s.State.Top().GetAsSliceIgnore()
+				a := s.State.Pop().GetAsSliceIgnore()
 				a = append(a, NewVal(tempStr))
+				s.State.Push(NewVal(a))
 				//不用pop，[号是匹配符号
 			}
 			return
@@ -145,11 +150,15 @@ func delChar(b byte) {
 			if s.State.GetOOA() {
 				if s.State.Size() == 1 {
 					//只剩下最后一个对象了，不就是json全解析完了嘛。。哈哈
+					s.Pop();s.Pop();		//最后两个{}pop出来
 					return
 				}
 				jsob := s.State.Pop().GetAsObjectIgnore()
+				s.Pop()				//} pop出来
+				s.Pop()				//: or ,  pop出来，属性前面肯定有冒号啊
+				s.Pop()				//{ pop出来
 				if s.State.GetOOA() {
-					s.State.Top().GetAsObjectIgnore()[keyStr] = NewVal(jsob)
+					s.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(jsob)
 				} else {
 					arr := s.State.Top().GetAsSliceIgnore()
 					arr = append(arr, NewVal(jsob))
@@ -161,9 +170,12 @@ func delChar(b byte) {
 			//也一定成立的
 			if !s.State.GetOOA() {
 				arr := s.State.Pop().GetAsSliceIgnore()
+				s.Pop()   			//]pop
 				if s.State.GetOOA() {
-					s.State.Top().GetAsObjectIgnore()[keyStr] = NewVal(arr)
+					s.Pop();s.Pop() 		//[pop he : pop
+					s.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(arr)
 				} else {
+					s.Pop();s.Pop()			//[pop he ,pop
 					arr := s.State.Top().GetAsSliceIgnore()
 					arr = append(arr,NewVal(arr))
 				}

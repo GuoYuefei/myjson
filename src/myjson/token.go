@@ -61,12 +61,13 @@ func GetSign(sign []byte,flag byte) *Sign {
 	case ",":
 		if flag & 0x80 == 0x80 {		//当在数组里的时候“，”期待的是下一个数组元素
 			s = newSign2(StaValue, TComma)
+		} else {
+			s = newSign2(StaKey, TComma)
 		}
-		s = newSign2(StaKey, TComma)
 	case "}":
 		s = newSign2(StaNone, TBracesR)
 	case "]":
-		s = newSign2(StaNone, TSquareL)
+		s = newSign2(StaNone, TSquareR)
 	default:
 		s = nil
 	}
