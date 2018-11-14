@@ -53,6 +53,13 @@ func (v *Value) GetAsString() (string, error) {
 	return "", errors.New("not a string value")
 }
 
+func (v *Value) GetAsStringIgnore() string {
+	if v, ok := v.value.(string); ok {
+		return v
+	}
+	return ""
+}
+
 //针对number类型 我本来想针对所有的数字类型的，但是实在要写很多重复的东西了，所以决定还是去掉一些几乎不用的吧
 
 func (v *Value) IsNumber() bool {

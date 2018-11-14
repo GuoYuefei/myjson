@@ -23,7 +23,7 @@ type Slice = []*Value
 
 //----------这个是token.go需要定义的数据-------------------------
 //忽然返现定义token前需要先定义状态
-type Status int
+type Status = int
 
 const (
 	//已经绝望的状态  啥都不期待了
@@ -45,7 +45,7 @@ const (
 var flagQuo = false
 
 //-----------还可以区分{}[]:," key value
-type WhatsType int
+type WhatsType = int
 const (
 	TBracesL WhatsType = iota
 	TBracesR

@@ -68,14 +68,14 @@ func (s *StackAnaly) Push(b byte) {
 		s.data[s.top] = b
 	}
 	s.data = append(s.data, b)
-
-	switch s.IsSign().GetStatus() {
-	case StaQuotation:
-		s.flag = s.flag | 0x40			//奇数引号设标志位
-	case StaSquare:
+	switch string([]byte{b}) {
+	case "\"":
+		//fmt.Println("wo jin lai le 0")
+		s.flag = s.flag ^ 0x40			//每次压入一个"时，第二位标志位取反
+	case "[":
 		s.flag = s.flag | 0x80			//[设标志位
 	}
-
+	//fmt.Println(s.IsSign())
 
 }
 
@@ -85,12 +85,15 @@ func (s *StackAnaly) Pop() byte {
 		return 0
 	}
 	//必须在top--之前
-	switch s.IsSign().GetWT() {
-	//引号情况居多，引号放前
-	case TQuotation:						//如果期待的是引号那么，他就是引号，标志置空
-		s.flag = s.flag & 0xBF			//去掉标志位
-	//case TSquareL:						//[出栈的时候将标志置空,------------------------------------->但是如果是两层嵌套呢，这里是一个bug，暂不管
-	//	s.flag = s.flag & 0x7F
+	if s.IsSign() != nil {
+		switch s.IsSign().GetWT() {
+		//引号情况居多，引号放前
+		case TQuotation:						//如果是引号，标志置空
+			s.flag = s.flag ^ 0xBF			//去掉标志位
+			//case TSquareL:						//[出栈的时候将标志置空,------------------------------------->但是如果是两层嵌套呢，这里是一个bug，暂不管
+			//	s.flag = s.flag & 0x7F
+		}
+
 	}
 
 	//当s。state中栈顶不是数组了，就置空标志位
