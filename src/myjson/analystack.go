@@ -45,7 +45,11 @@ type StackAnaly struct {
 
 func NewStackAnaly() *StackAnaly {
 	//起初的byte先放50个，以后看情况定吧
-	return &StackAnaly{make([]byte, 0, 50), -1, 0, NewStack()}
+	return NewStackAnalyByStack(NewStack())
+}
+
+func NewStackAnalyByStack(s *Stack) *StackAnaly {
+	return &StackAnaly{make([]byte, 0, 50), -1, 0, s}
 }
 
 //实现StackSer的过程
@@ -67,9 +71,9 @@ func (s *StackAnaly) Push(b byte) {
 
 	switch s.IsSign().GetStatus() {
 	case StaQuotation:
-		s.flag = s.flag | 0x40
+		s.flag = s.flag | 0x40			//奇数引号设标志位
 	case StaSquare:
-		s.flag = s.flag | 0x80
+		s.flag = s.flag | 0x80			//[设标志位
 	}
 
 
@@ -81,14 +85,19 @@ func (s *StackAnaly) Pop() byte {
 		return 0
 	}
 	//必须在top--之前
-	switch s.IsSign().GetStatus() {
+	switch s.IsSign().GetWT() {
 	//引号情况居多，引号放前
-	case StaQuotation:						//如果期待的是引号那么，他就是引号，标志置空
+	case TQuotation:						//如果期待的是引号那么，他就是引号，标志置空
 		s.flag = s.flag & 0xBF			//去掉标志位
-	case StaSquare:						//[出栈的时候将标志置空
-		s.flag = s.flag & 0x7F
-
+	//case TSquareL:						//[出栈的时候将标志置空,------------------------------------->但是如果是两层嵌套呢，这里是一个bug，暂不管
+	//	s.flag = s.flag & 0x7F
 	}
+
+	//当s。state中栈顶不是数组了，就置空标志位
+	if s.State.GetOOA() {
+		s.flag = s.flag & 0x7F
+	}
+
 	b := s.data[s.top]
 	s.top-- //只减不删
 	return b
@@ -188,7 +197,24 @@ func (s *Stack) Push(v *Value) {
 	} else {
 		s.data = append(s.data, v)
 	}
+	s.setOOA()
+
 }
+
+//根据顶层元素置位，当顶层元素发生变化时必须调用
+func (s *Stack)setOOA() {
+	v := s.data[s.top]
+	//如果是jsob。那么就置obOrAr为true
+	if v.IsObject() {
+		s.obOrAr = true
+	}
+
+	if v.IsSlice() {
+		s.obOrAr = false
+	}
+}
+
+
 
 func (s *Stack) Pop() *Value {
 	if s.IsEmpty() {
@@ -196,6 +222,9 @@ func (s *Stack) Pop() *Value {
 	}
 	v := s.data[s.top]
 	s.top--
+
+	s.setOOA()
+
 	return v
 }
 
@@ -213,16 +242,16 @@ func (s *Stack) Size() int {
 func (s *Stack) Clear() {
 	s.top = -1
 }
+//
+//func (s *Stack) SetTrue() {
+//	s.obOrAr = true
+//}
+//
+//func (s *Stack) SetFalse() {
+//	s.obOrAr = false
+//}
 
-func (s *Stack) SetTrue() {
-	s.obOrAr = true
-}
-
-func (s *Stack) SetFalse() {
-	s.obOrAr = false
-}
-
-func (s *Stack) GetFlag() bool {
+func (s *Stack) GetOOA() bool {
 	return s.obOrAr
 }
 
