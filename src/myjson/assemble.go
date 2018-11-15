@@ -42,13 +42,24 @@ func delChar(b byte) {
 	//更新下，
 	sign = s.IsSign()
 
-	if sign == nil {
-		//当不是json关键字时就认为是字符串的一部分（此时s.GetFlag() & 0x40==0x40）
-		//或者是number、true、false、null
-
+	//。。。。。！！！！！！！！！！！！！！！
+	if s.IsSign()== nil{
 		//暂且不分辨
 		return
 	}
+
+	/**
+	判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign() == nil
+	 */
+
+	//if s.IsSign().GetWT() == TComma {
+	//	// == 逗号
+	//	v := s.Pop()
+	//
+	//
+	//
+	//	s.Push(v)
+	//}
 
 
 	//-----------------------string(key-value)----------------------------------
