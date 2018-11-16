@@ -174,6 +174,20 @@ func (v *Value) GetAsInt() (result int, err error) {
 	return
 }
 
+func (v *Value) GetAsIntIgnore() (result int) {
+	switch a := v.value.(type) {
+	case int:
+		result = a
+	case int8:
+		result = int(a)
+	case uint8:
+		result = int(a)
+	default:
+		result = int(^uint(0) >> 1)		//返回一个最大值
+	}
+	return
+}
+
 func (v *Value) GetAsUint() (result uint, err error) {
 	err = nil
 	switch a := v.value.(type) {
@@ -184,6 +198,18 @@ func (v *Value) GetAsUint() (result uint, err error) {
 	default:
 		result = 0
 		err = errors.New("can not get a uint number")
+	}
+	return
+}
+
+func (v *Value) GetAsUintIgnore() (result uint) {
+	switch a := v.value.(type) {
+	case uint:
+		result = a
+	case uint8:
+		result = uint(a)
+	default:
+		result = ^uint(0) >> 1			//无符号最大值
 	}
 	return
 }
@@ -229,6 +255,26 @@ func (v *Value) GetAsFloat64() (result float64, err error) {
 		default:
 			result = 0
 			err = errors.New("can not get a float64 number")
+		}
+	}
+	return
+}
+
+func (v *Value) GetAsFloat64Ignore() (result float64) {
+	if _, ok := v.WhichNumType(); ok {
+		switch a := v.value.(type) {
+		case float64:
+			result = a
+		case uint:
+			result = float64(a)
+		case int:
+			result = float64(a)
+		case uint8:
+			result = float64(a)
+		case int8:
+			result = float64(a)
+		default:
+			result = float64(int(^uint(0)>>1))			//返回一个int下的最大整数吧
 		}
 	}
 	return

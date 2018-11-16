@@ -26,6 +26,13 @@ func init() {
 可以在加上关键字		"关键字类型	{}[]":,
  */
 
+ /**
+ delChar这个函数可以分成三块，
+ number、true、fasle、null判定块
+ string判定块，可以分成key、value两块
+ 容器判定块，可以分成数组和对象
+ 三大块内部判定方式相似，但是三大块之间各有不同
+  */
 
 
 //先处理一个字符
@@ -33,26 +40,17 @@ func init() {
 //这个函数只负责处理keyWord
 func delChar(b byte) {
 	var sign *Sign
-	//这一部分是分析栈顶元素
-	if !s.IsEmpty() {
-
-
-	}
 	s.Push(b)
-	//更新下，
+
 	sign = s.IsSign()
 
-	//。。。。。！！！！！！！！！！！！！！！
 	if s.IsSign()== nil{
-		//暂且不分辨
 		return
 	}
-
 	/**
 	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign() == nil
 	2、对应的判定这些结束的标志是： ， [
 	 */
-
 	if a := s.IsSign().GetWT(); a == TComma || a == TBracesR || a == TSquareR {
 		var temp string	= ""		//先把这些类型的字符串形式拿出来准没错
 		//var strb byte
@@ -79,13 +77,6 @@ func delChar(b byte) {
 			temp = temp + string([]byte{ss.Pop()})
 		}
 		_, value := CheckNTFN(temp)
-		//switch t {
-		//case Int:
-		//	PutValue(s, value)
-		//case Float64:
-		//
-		//
-		//}
 		PutValue(s, value)
 		s.PushWithoutCheck(v)  		//还原} ] ,
 		goto KEYWORD2			//如果是] }那么还需要处理
@@ -126,48 +117,16 @@ KEYWORD1:
 				keyStrs.Push(tempStr)
 				s.Pop()			//顺便把，逗号pop出来了
 			}
-
-
 			//----------------value---------------------
-			if s.IsSign().GetWT() == TColon {
-				//这里是冒号情况下value的情况，需要让：出栈
-				if s.State.GetOOA() {
-					//其实一定在对象里的，冒号是不会在数组里出现的
-					s.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(tempStr)
-				}
-				s.Pop()		//冒号pop出来
-			} else if s.IsSign().GetWT() == TComma && !s.State.GetOOA() {
-				//这里Pop出来有Push回去低效率了，以后看到修复
-				a := s.State.Pop().GetAsSliceIgnore()
-				a = append(a, NewVal(tempStr))
-				s.State.Push(NewVal(a))
-				s.Pop()			//逗号pop出来
-			} else if s.IsSign().GetWT() == TSquareL {
-				//数组的第一个元素
-				a := s.State.Pop().GetAsSliceIgnore()
-				a = append(a, NewVal(tempStr))
-				s.State.Push(NewVal(a))
-				//不用pop，[号是匹配符号
-			}
+			PutValue(s, NewVal(tempStr))
 			return
 		}
-
 	}
-
-
-
 KEYWORD2:
 //--------------------------------------keyWord-------------------------------
-
-
 	//push完后分析状态
 	//如果是关键字的话
 	if s.IsSign() != nil {
-		if sign.GetStatus() == StaQuotation {
-			//刚刚在s中push了一个奇数个引号，其实整个栈中就一个引号
-			//return false		//返回一个false，需要一个新的分析函数,就叫字符串分析函数吧，除了解析出字符串以外还需要分辨是key还是value
-			//什么也不用做，push的过程已经全部做好了
-		}
 
 		if sign.GetStatus() == StaCloBrace {
 			//当期待}的时候，接下来的东西在对象中
@@ -180,8 +139,7 @@ KEYWORD2:
 		if sign.GetStatus() == StaSquare {
 			fmt.Println(string([]byte{s.Top()}))
 			//当期待]的时候，接下来的东西在数组中
-			array := make([]*Value,0,20)
-
+			array := make([]*Value,0,10)
 			s.State.Push(NewVal(array))
 		}
 
@@ -210,7 +168,6 @@ KEYWORD2:
 			//也一定成立的
 			fmt.Println(string([]byte{s.Top()}))
 			if !s.State.GetOOA() {
-
 				arr := s.State.Pop().GetAsSliceIgnore()
 				s.Pop()   			//]pop
 				if s.State.GetOOA() {
@@ -234,5 +191,10 @@ KEYWORD2:
 	return
 }
 
+func clearAllStack() {
+	ss.Clear()
+	keyStrs.Clear()
+	s.Clear()			//sState在内部被Clear了
+}
 
 

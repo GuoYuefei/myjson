@@ -79,9 +79,11 @@ func TestAssembleFile(t *testing.T) {
 		delChar(b)
 	}
 	fmt.Println(s.State.Top().GetAsObjectIgnore())
-	fmt.Println(s.State.Top().GetAsObjectIgnore()["key4"].GetAsObjectIgnore()["key5"].GetAsInt())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key3"].GetAsSliceIgnore())
+	fmt.Println(s.State.Top().GetAsObjectIgnore()["key4"].GetAsObjectIgnore()["key5"].GetAsInt())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"].GetAsSliceIgnore()[1].GetAsSliceIgnore()[1].GetAsInt())
+	fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"].GetAsSliceIgnore()[0].GetAsSliceIgnore()[3].GetAsStringIgnore())
+	fmt.Println(s.State.Top().GetAsObjectIgnore()["key6"].GetAsObjectIgnore()["key8"].GetAsObjectIgnore()["key9"].GetAsStringIgnore())
 	fmt.Println(s.data,s.Size(),len(string(bs)))
 	fmt.Println(ss.data,s.Size())
 	fmt.Println(keyStrs.data,keyStrs.Size())

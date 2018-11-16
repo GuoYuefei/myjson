@@ -40,6 +40,7 @@ type StackAnaly struct {
 	State *Stack
 }
 
+
 //忽然发现还需要一个value栈，写在后面了，嗯，重复代码就重复了吧。这里我还是比较想追求一个效率的
 //其实有办法可以减少代码量，但是函数调用太多了，byte栈是经常在用的，所以不好牺牲效率
 
@@ -114,6 +115,8 @@ func (s *StackAnaly) Size() int {
 
 func (s *StackAnaly) Clear() {
 	s.top = -1
+	s.State.Clear()
+	s.flag = 0x00
 }
 
 //-----------------接下来需要考虑为这个栈增添什么功能-----------
@@ -238,6 +241,7 @@ func (s *Stack) Size() int {
 
 func (s *Stack) Clear() {
 	s.top = -1
+	s.obOrAr = true
 }
 //
 //func (s *Stack) SetTrue() {
