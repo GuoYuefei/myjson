@@ -178,6 +178,7 @@ KEYWORD2:
 		}
 
 		if sign.GetStatus() == StaSquare {
+			fmt.Println(string([]byte{s.Top()}))
 			//当期待]的时候，接下来的东西在数组中
 			array := make([]*Value,0,20)
 
@@ -207,16 +208,24 @@ KEYWORD2:
 
 		if sign.GetWT() == TSquareR {
 			//也一定成立的
+			fmt.Println(string([]byte{s.Top()}))
 			if !s.State.GetOOA() {
+
 				arr := s.State.Pop().GetAsSliceIgnore()
 				s.Pop()   			//]pop
 				if s.State.GetOOA() {
 					s.Pop();s.Pop() 		//[pop he : pop
 					s.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(arr)
 				} else {
-					s.Pop();s.Pop()			//[pop he ,pop
-					arr := s.State.Top().GetAsSliceIgnore()
-					arr = append(arr,NewVal(arr))
+					//该数组作为栈顶数组的元素
+					s.Pop();			//[pop
+					if s.IsSign().GetWT() == TComma {
+						//当s栈顶是，
+						s.Pop()				//把，pop出去
+					}
+					temp := s.State.Pop().GetAsSliceIgnore()
+					temp = append(temp,NewVal(arr))
+					s.State.Push(NewVal(temp))
 				}
 			}
 		}
