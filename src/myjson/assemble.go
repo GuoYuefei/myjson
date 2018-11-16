@@ -49,19 +49,49 @@ func delChar(b byte) {
 	}
 
 	/**
-	判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign() == nil
+	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign() == nil
+	2、对应的判定这些结束的标志是： ， [
 	 */
 
-	//if s.IsSign().GetWT() == TComma {
-	//	// == 逗号
-	//	v := s.Pop()
-	//
-	//
-	//
-	//	s.Push(v)
-	//}
+	if a := s.IsSign().GetWT(); a == TComma || a == TBracesR || a == TSquareR {
+		var temp string	= ""		//先把这些类型的字符串形式拿出来准没错
+		//var strb byte
+		// 将栈顶标识符弹出
+		v := s.PopWithoutCheck()
+
+		if s.IsSign() != nil {
+			//当标识符pop出来之后，还有关键字的话就不执行这个if中的任何内容
+			s.PushWithoutCheck(v)			//还原s
+			goto KEYWORD1
+		}
 
 
+		//这个时候我们确定这里的值就是number，true，false，null了
+		//当s.IsSign ！= nil就认为value结束了，下一个肯定是标志符了
+		for s.IsSign() == nil {
+			//这里还需要分} ]这两种情况，因为这时候分别是一个对象和数组的结束
+			//如果是} ]还需要跳转到} ]出执行
+
+			//先取出变量的字符串形式
+			ss.PushWithoutCheck(s.Pop())
+		}
+		for !ss.IsEmpty() {
+			temp = temp + string([]byte{ss.Pop()})
+		}
+		_, value := CheckNTFN(temp)
+		//switch t {
+		//case Int:
+		//	PutValue(s, value)
+		//case Float64:
+		//
+		//
+		//}
+		PutValue(s, value)
+		s.PushWithoutCheck(v)  		//还原} ] ,
+		goto KEYWORD2			//如果是] }那么还需要处理
+	}
+
+KEYWORD1:
 	//-----------------------string(key-value)----------------------------------
 
 	//如果是引号的话
@@ -76,7 +106,7 @@ func delChar(b byte) {
 			s.Pop()
 			for s.IsSign() == nil {
 				//当栈顶元素不是引号时一直弹出到ss中
-				ss.Push(s.Pop())
+				ss.PushWithoutCheck(s.Pop())
 			}
 			s.Pop()		//剩余的“pop出来
 			for !ss.IsEmpty() {
@@ -125,13 +155,11 @@ func delChar(b byte) {
 	}
 
 
-	//-------------------------分析number-----------------------------
-	//首先number是value
-	//if s.IsSign()==nil && s.IsSign().GetWT() == TColon || (s.IsSign().GetWT() == TColon && !s.State.GetOOA()) || s.IsSign().GetWT() == TSquareL {
-	//
-	//}
 
+KEYWORD2:
 //--------------------------------------keyWord-------------------------------
+
+
 	//push完后分析状态
 	//如果是关键字的话
 	if s.IsSign() != nil {
@@ -194,9 +222,7 @@ func delChar(b byte) {
 		}
 
 	}
-
 	return
-
 }
 
 

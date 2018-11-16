@@ -12,6 +12,9 @@ const (
 	Float64
 	Array
 	Object
+	True
+	False
+	Str
 )
 
 //定义一个别名，这个类型是一个js的对象，实际上就是js对象该有的样子

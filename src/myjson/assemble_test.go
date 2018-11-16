@@ -2,6 +2,7 @@ package myjson
 
 import (
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
@@ -42,4 +43,41 @@ func TestAssemble2(t *testing.T) {
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["ids"].GetAsSliceIgnore()[0].GetAsStringIgnore())
 
 	fmt.Println(s.data,s.Size(),len(str2))
+}
+
+func TestAssemble3(t *testing.T) {
+	str3 := "{\"name\":\"gyf\",\"age\":12,\"sex\":true,\"abc\":null,\"ids\":[\"33\",\"44\"],\"ids1\":{\"id1\":32,\"id2\":111}}"
+	var bs []byte = make([]byte,0,20)
+	bs = append(bs, []byte(str3)...)
+	for _, b := range bs {
+		delChar(b)
+		//fmt.Println(keyStr)
+	}
+	fmt.Println(s.State.Top().GetAsObjectIgnore())
+	fmt.Println(s.State.Top().GetAsObjectIgnore()["age"].GetAsInt())
+	fmt.Println(s.data,s.Size(),len(str3))
+	v, err := s.State.Top().GetAsObjectIgnore()["sex"].GetAsBool()
+	if err != nil {
+		t.Error("测试失败")
+	}
+	if v {
+		fmt.Println(v)
+	}
+	fmt.Println(s.State.Top().GetAsObjectIgnore()["abc"].IsNull())
+}
+
+//测试字符串来自文件
+func TestAssembleFile(t *testing.T) {
+	bs, err := ioutil.ReadFile("./xx.json")
+	if err != nil {
+		t.Error("读取文件失败")
+		panic(err)
+	}
+	bs = CompressJson(bs)
+	fmt.Println(string(bs))
+	for _, b := range bs {
+		delChar(b)
+	}
+	fmt.Println(s.State.Top().GetAsObjectIgnore())
+	fmt.Println(s.data,s.Size(),len(string(bs)))
 }

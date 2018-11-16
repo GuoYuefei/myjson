@@ -77,29 +77,6 @@ func GetSign(sign []byte,flag byte) *Sign {
 	return s
 }
 
-type Token struct {
-	//前节点，这是一个双亲表示法
-	parent *Token
-	//当前节点的值
-	value *Value
-	//当前节点的状态，这个状态取决于前一个关键字也就是前一个Sign对象，特别注意{ “ ： ，[
-	status Status
-}
 
-func NewToken(p *Token, v *Value, s Status) *Token {
-	return &Token{p, v, s}
-}
-
-func (t *Token) GetParent() *Token {
-	return t.parent
-}
-
-func (t *Token) GetValue() *Value {
-	return t.value
-}
-
-func (t *Token) GetStatus() Status {
-	return t.status
-}
 
 //还需要一个栈，这个栈需要自定义一些方法，所以感觉可以重开一个文件
