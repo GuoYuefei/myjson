@@ -48,11 +48,11 @@ func delChar(b byte) {
 
 	sign = s.IsSign()
 
-	if s.IsSign() == nil || s.GetFlag()&0x40 == 0x40 {
+	if s.IsSign().GetWT() == TNone || s.GetFlag()&0x40 == 0x40 {
 		return
 	}
 	/**
-	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign() == nil
+	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign().GetWT == TNone
 	2、对应的判定这些结束的标志是： ， [
 	 */
 	if a := s.IsSign().GetWT(); a == TComma || a == TBracesR || a == TSquareR {
@@ -61,7 +61,7 @@ func delChar(b byte) {
 		// 将栈顶标识符弹出
 		v := s.PopWithoutCheck()
 
-		if s.IsSign() != nil {
+		if s.IsSign().GetWT() != TNone {
 			//当标识符pop出来之后，还有关键字的话就不执行这个if中的任何内容
 			s.PushWithoutCheck(v)			//还原s
 			goto KEYWORD1
@@ -69,8 +69,8 @@ func delChar(b byte) {
 
 
 		//这个时候我们确定这里的值就是number，true，false，null了
-		//当s.IsSign ！= nil就认为value结束了，下一个肯定是标志符了
-		for s.IsSign() == nil {
+		//当s.IsSign.GetWT ！= TNone就认为value结束了，下一个肯定是标志符了
+		for s.IsSign().GetWT() == TNone {
 			//这里还需要分} ]这两种情况，因为这时候分别是一个对象和数组的结束
 			//如果是} ]还需要跳转到} ]出执行
 
@@ -96,9 +96,9 @@ KEYWORD1:
 			//如果接收到下一个引号了,那么就标志着一个字符串的结束
 			//因为第二位标志符号会在第二个”引号来的时候重置
 			var tempStr string = ""
-			s.Pop()
-			//当s.IsSign是nil时如果单只有后面的表达式是报错，其实，我觉得当时设计Sign的时候应该多加一个其他类型的，不然也不用这么麻烦了
-			for s.IsSign() == nil {
+			s.Pop()			//右引号弹出
+			//在没有碰到左引号时认为都是字符串里的东西
+			for s.IsSign().GetWT() != TQuotation {
 				//当栈顶元素不是引号时一直弹出到ss中
 				ss.PushWithoutCheck(s.Pop())
 			}
@@ -127,9 +127,11 @@ KEYWORD1:
 	}
 KEYWORD2:
 //--------------------------------------keyWord-------------------------------
+	//更新下sign，可能是goto到这的
+	sign = s.IsSign()
 	//push完后分析状态
 	//如果是关键字的话
-	if s.IsSign() != nil {
+	if sign.GetWT() != TNone {
 
 		if sign.GetStatus() == StaCloBrace {
 			//当期待}的时候，接下来的东西在对象中

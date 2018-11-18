@@ -15,9 +15,9 @@ func main() {
 	//will see &{14} :  14
 	fmt.Println(value, ": ", value.GetAsIntIgnore())
 	//or you can get JsObeject
-	//jsob, _ := myjson.GetJsObject(bytes)
-	//value = myjson.GetFromJsObject(jsob, "date.time.minutes")
-	//fmt.Println(value, ":", value.GetAsIntIgnore())
-	//fmt.Println(myjson.GetFromJsObject(jsob, "date.datetime").GetAsStringIgnore())
+	jsob, _ := myjson.GetJsObject(bytes)
+	value = myjson.GetFromJsObject(jsob, "date.time.minutes")
+	fmt.Println(value, ":", value.GetAsIntIgnore())
+	fmt.Println(myjson.GetFromJsObject(jsob, "date.datetime").GetAsStringIgnore())
 
 }

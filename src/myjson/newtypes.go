@@ -50,7 +50,8 @@ var flagQuo = false
 //-----------还可以区分{}[]:," key value
 type WhatsType = int
 const (
-	TBracesL WhatsType = iota
+	TNone WhatsType = iota
+	TBracesL
 	TBracesR
 	TSquareL
 	TSquareR
@@ -60,6 +61,4 @@ const (
 	TColon
 	//逗号
 	TComma
-	TKey			//key
-	TValue			//value
 )

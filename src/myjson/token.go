@@ -69,11 +69,9 @@ func GetSign(sign []byte,flag byte) *Sign {
 	case "]":
 		s = newSign2(StaNone, TSquareR)
 	default:
-		s = nil
+		s = newSign2(StaNone, TNone)
 	}
-	if s != nil {
-		s.setV(sign)
-	}
+	s.setV(sign)
 	return s
 }
 
