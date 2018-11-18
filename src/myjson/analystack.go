@@ -26,6 +26,8 @@ type StackSer interface {
 	Size() int
 }
 
+
+
 type StackAnaly struct {
 	//数据所在容器
 	data []byte

@@ -3,6 +3,7 @@ package myjson
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -35,4 +36,21 @@ func TestGetJsObjectByBufReader(t *testing.T) {
 	fileReader := bufio.NewReader(file)
 	jsob, _ := GetJsObjectByBufReader(fileReader)
 	fmt.Println(jsob)
+}
+
+func TestGet(t *testing.T) {
+	bytes, e := ioutil.ReadFile("./yy.json")
+	if e != nil {
+		t.Error("读取失败")
+	}
+	var v *Value = Get(bytes, "contributor")
+	fmt.Println(v.GetAsSliceIgnore()[0].GetAsStringIgnore())
+	v = Get(bytes, "date.year")
+	fmt.Println(v.GetAsIntIgnore())
+	jso, err := GetJsObject(bytes)
+	if err != nil {
+		t.Error("测试失败")
+	}
+	fmt.Println(GetFromJsObject(jso,"date.month").GetAsIntIgnore())
+	fmt.Println(GetFromJsObject(jso, "date.day").GetAsIntIgnore())
 }

@@ -62,13 +62,45 @@ func PutValue(sa *StackAnaly,value *Value) {
 }
 
 //压缩json
+//string类型中的空格换行什么的都不能去除
 func CompressJson(bs []byte) []byte {
 	str := string(bs)
-	//去除空格
-	str = strings.Replace(str, " ", "", -1)
-	//去除换行
-	str = strings.Replace(str, "\n", "", -1)
-	//windows下还可能有回车
-	str = strings.Replace(str, "\r", "", -1)
+	//有json字符串规律可知，json的字符串中引号不会出现开头与结尾
+	after := strings.SplitAfter(str, "\"")
+	str = ""
+	for i, v := range after {
+		if i % 2 == 0 {
+			//偶数段一定不是字符串段
+			v = strings.Replace(v, " ","", -1)			//去除空格
+			//去除换行
+			v = strings.Replace(v, "\n","", -1)
+			//windows下还可能有回车
+			v = strings.Replace(v, "\r", "", -1)
+		}
+		str = str + v
+	}
 	return []byte(str)
 }
+
+func FormatJson(bs []byte) []byte {
+	str := string(bs)
+	//做一些format的事情
+
+	return []byte(str)
+}
+
+//分析参数用的
+////str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\",\"id2\":\"2\"}}"
+//以上的形成的js对象，param 为 name时得到的是以“gyf”为包装的*Value值   ids.id1 就是 “1”的*Value
+//所以这里主要是将param字符串中的内容以”.“为分割 分割成string切片返回
+func ParseParam(param string) []string {
+	return strings.Split(param, ".")
+}
+
+
+
+
+
+
+
+
