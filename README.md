@@ -1,4 +1,32 @@
 # myjson
-嗯。。。  
-不着急，只是包装好Value的值，接下来需要理清各节点有哪些状态，各token之间的应该有的逻辑。嗯就这样了。。。哈哈哈哈   
---------
+
+
+
+MyJson is a Go package that provides a fast and simple way to get values from a json document.
+
+## Getting Started
+
+### Install
+
+To start using MyJson,Install Go and run <code>go get</code>:
+
+```shell
+$ go get -u github.com/GuoYuefei/myjson
+```
+
+This will retrieve the library.
+
+### Usage Example
+
+
+
+## More Usage
+
+
+
+## License
+
+EPL
+
+
+
