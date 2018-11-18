@@ -9,6 +9,8 @@ import (
 反序列化的各个函数接口
  */
 
+//基础函数，底层函数，也比较好用
+//根据字节数组解析成相应的JsObject，成功error就返回nil，否则返回相应错误
 func GetJsObject(json []byte) (JsObject, error) {
 	clearAllStack()
 	json = CompressJson(json)			//必须先压缩，在识别
@@ -36,5 +38,34 @@ func GetJsObjectByReader(reader io.Reader) (JsObject, error) {
 	return GetJsObjectByBufReader(bufReader)
 }
 
+
+//根据param得到JsObject中的内容
+//参照Get函数的注释资料
+func GetFromJsObject(object JsObject, param string) *Value {
+	params := ParseParam(param)
+	var jso JsObject = object
+	for i, v := range params {
+		if i == len(params) - 1 {
+			//最后一个可能不是object
+			break
+		}
+		jso = jso[v].GetAsObjectIgnore()
+	}
+	return jso[params[len(params) - 1]]
+}
+
+
+//根据para参数获取Value的值
+//str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\",\"id2\":\"2\"}}"
+//比如以上的json字符串作为[]byte参数
+//“ids.id1”作为param参数
+//得到的结果就是NewVal("1")的指针
+func Get(json []byte, param string) *Value{
+	object, e := GetJsObject(json)
+	if e != nil {
+		panic(e)		//暂时不处理
+	}
+	return GetFromJsObject(object, param)
+}
 
 
