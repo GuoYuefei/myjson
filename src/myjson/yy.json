@@ -5,8 +5,13 @@
     "Solomon Guo"
   ],
   "date":{
+    "datetime":"2018-11-18 14:26",
     "year":2018,
     "month":11,
-    "day":18
+    "day":18,
+    "time":{
+      "hour":14,
+      "minutes":26
+    }
   }
 }

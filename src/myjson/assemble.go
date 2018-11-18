@@ -27,6 +27,10 @@ func init() {
  */
 
  /**
+ 最复杂的逻辑写在了这一块
+  */
+
+ /**
  delChar这个函数可以分成三块，
  number、true、fasle、null判定块
  string判定块，可以分成key、value两块
@@ -44,7 +48,7 @@ func delChar(b byte) {
 
 	sign = s.IsSign()
 
-	if s.IsSign()== nil{
+	if s.IsSign() == nil || s.GetFlag()&0x40 == 0x40 {
 		return
 	}
 	/**
@@ -87,14 +91,13 @@ KEYWORD1:
 
 	//如果是引号的话
 	if sign.GetWT() == TQuotation {
-		fmt.Println("wojin lai le 1")
 		//栈的状态标志在string档位，所以所有的字符进来全是string的一部分
 		if s.GetFlag() & 0x40 == 0x00 {
 			//如果接收到下一个引号了,那么就标志着一个字符串的结束
 			//因为第二位标志符号会在第二个”引号来的时候重置
-			fmt.Println("wo jin lai le 2")
 			var tempStr string = ""
 			s.Pop()
+			//当s.IsSign是nil时如果单只有后面的表达式是报错，其实，我觉得当时设计Sign的时候应该多加一个其他类型的，不然也不用这么麻烦了
 			for s.IsSign() == nil {
 				//当栈顶元素不是引号时一直弹出到ss中
 				ss.PushWithoutCheck(s.Pop())
