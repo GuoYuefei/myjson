@@ -6,33 +6,39 @@ import (
 
 //json是js的对象的序列化
 //值应该与js对应
-//js.string = go.string
-//js.number = go.float64
-//js.null = go.nil
-//js.bool = go.bool
-//js.array = go.array
-//js.object = go.map or object
-
+// js.string = go.string
+// js.number = go.float64
+// js.null = go.nil
+// js.bool = go.bool
+// js.array = go.array
+// js.object = go.map or object
 type Value struct {
 	//把value封装起来
 	value interface{}
 }
 
+// Returns a *Value type representing an empty type
 func NewValue() *Value {
 	return &Value{nil}
 }
 
+// Provide an arbitrary type of parameter 'a'
+// Returns a *type type representing Returns a *type type representing the value of any type 'a'
 func NewVal(a interface{}) *Value {
 	return &Value{a}
 }
 
+// Provide an arbitrary type of parameter 'a'
+// Then v.value = a
+// mean 'v' now starts to represent the value of 'a'
 func (v *Value) SetValue(a interface{}) {
 	v.value = a
 }
 
 //针对string类型，有下类方法
 
-//当是string类型时返回true否则为false
+// Determine whether v represents a variable of type string
+// Return true if it is a string type, otherwise return false
 func (v *Value) IsString() bool {
 	if _, ok := v.value.(string); ok {
 		return true
@@ -41,11 +47,15 @@ func (v *Value) IsString() bool {
 }
 
 //赋值一个string变量
+//Receive a parameter of type string
+//The variable v will be assigned the value of the parameter
 func (v *Value) SetAsString(value string) {
 	v.value = value
 }
 
 //值作为string返回，因为可能存在该值不是string的情况，所以第二个返回值用于返回是否发生错误
+// The value is returned as a string, because there may be cases where the value is not a string,
+// so the second return value is used to return whether an error has occurred.
 func (v *Value) GetAsString() (string, error) {
 	if v, ok := v.value.(string); ok {
 		return v, nil
@@ -53,6 +63,10 @@ func (v *Value) GetAsString() (string, error) {
 	return "", errors.New("not a string value")
 }
 
+//值作为string类型返回，并且忽略错误的发生。若发生错误则返回空字符串
+//这个方法是为了方便连续调用
+// The value is returned as a string type and the occurrence of the error is ignored. Return an empty string if an error occurs
+// This method is to facilitate continuous calls
 func (v *Value) GetAsStringIgnore() string {
 	if v, ok := v.value.(string); ok {
 		return v
@@ -62,6 +76,9 @@ func (v *Value) GetAsStringIgnore() string {
 
 //针对number类型 我本来想针对所有的数字类型的，但是实在要写很多重复的东西了，所以决定还是去掉一些几乎不用的吧
 
+//Determine whether v represents a variable of type Number
+//Return true if it is a Number type, otherwise return false
+//Only int, uint, int8, uint8(byte), float64 types are supported here.
 func (v *Value) IsNumber() bool {
 	switch v.value.(type) {
 	case int, uint, int8, uint8, float64:
@@ -71,17 +88,22 @@ func (v *Value) IsNumber() bool {
 	}
 }
 
+//返回类型Number的具体类型，当值v不是Number类型的时候返回第二个返回值返回false，否则第二返回值返回true
+//第一个返回值返回该具体数字类型
+// Returns the specific type of the type Number, when the value v is not the Number type,
+// return the second return value returns false, otherwise the second return value returns true
+// The first return value returns the specific number type
 func (v *Value) WhichNumType() (NumberType, bool) {
 	var result NumberType = Null
 	switch v.value.(type) {
 	case int:
-		result = Int
+		result = Uint8
 	case uint:
 		result = Uint
 	case int8:
 		result = Int8
 	case uint8:
-		result = Uint8
+		result = Int
 	case float64:
 		result = Float64
 	//数组类型找不到一个合适的表示方式，但是可以放在defult中
@@ -97,7 +119,9 @@ func (v *Value) WhichNumType() (NumberType, bool) {
 	return result, true
 }
 
-//参数是需要判定的类型，如果v是这个类型正确就返回true
+//参数是需要判定的类型，如果参数所提供的类型就是值v的类型则返回true，否则返回false
+//The parameter is provided with a type tag,
+//Return true if the type provided by the argument is the type of the value v, otherwise return false
 func (v *Value) IsWhichNumType(numberType NumberType) bool {
 	if nt, ok := v.WhichNumType(); ok && nt == numberType {
 		return true
@@ -105,28 +129,38 @@ func (v *Value) IsWhichNumType(numberType NumberType) bool {
 	return false
 }
 
+//Determine whether v represents a variable of type uint
+//Return true if it is a Uint type, otherwise return false
 func (v *Value) IsUint() bool {
 	return v.IsWhichNumType(Uint)
 }
 
+//Determine whether v represents a variable of type int
+//Return true if it is a int type, otherwise return false
 func (v *Value) IsInt() bool {
 	return v.IsWhichNumType(Int)
 }
 
+//Determine whether v represents a variable of type byte
+//Return true if it is a byte type, otherwise return false
 func (v *Value) IsUint8() bool {
 	return v.IsWhichNumType(Uint8)
 }
 
+//Determine whether v represents a variable of type int8
+//Return true if it is a int8 type, otherwise return false
 func (v *Value) IsInt8() bool {
 	return v.IsWhichNumType(Int8)
 }
 
+//Determine whether v represents a variable of type bool
+//Return true if it is a bool type, otherwise return false
 func (v *Value) IsFloat64() bool {
 	return v.IsWhichNumType(Float64)
 }
 
-//因为用户传入的a可能不是数字类型，所以可能存在赋值错误的情况
-//只接受五个类型uint int int8 uint8 float64
+//Because the user-inputted a may not be a numeric type, there may be an assignment error.
+//Only accept five types uint int int8 uint8 float64
 func (v *Value) SetAsNumber(a interface{}) error {
 	var value = NewValue()
 	value.SetValue(a)
@@ -325,6 +359,8 @@ func (v *Value) SetAsObject(a JsObject) {
 	v.value = a
 }
 
+//Determine whether v represents a variable of type Object
+//Return true if it is a Object type, otherwise return false
 func (v *Value) IsObject() bool {
 	_, ok := v.value.(JsObject)
 	return ok
@@ -353,6 +389,8 @@ func (v *Value) GetAsObjectIgnore() JsObject {
 //end of Object
 
 //begin Array = Slice
+//Determine whether v represents a variable of type Slice
+//Return true if it is a Slice type, otherwise return false
 func (v *Value) IsSlice() bool {
 	_, ok := v.value.([]*Value)
 	return ok

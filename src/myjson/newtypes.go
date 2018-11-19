@@ -3,6 +3,7 @@ package myjson
 //----------这个是jsonValue.go需要定义的简单结构---------------
 type NumberType int
 
+//Array, Object, True, False as a special number type
 const (
 	Null NumberType = iota
 	Uint
