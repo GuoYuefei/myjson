@@ -7,11 +7,11 @@ import (
 //json是js的对象的序列化
 //值应该与js对应
 // js.string = go.string
-// js.number = go.float64
+// js.number = go.float64...
 // js.null = go.nil
 // js.bool = go.bool
 // js.array = go.array
-// js.object = go.map or object
+// js.object = go.map / object
 type Value struct {
 	//把value封装起来
 	value interface{}
@@ -120,8 +120,8 @@ func (v *Value) WhichNumType() (NumberType, bool) {
 }
 
 //参数是需要判定的类型，如果参数所提供的类型就是值v的类型则返回true，否则返回false
-//The parameter is provided with a type tag,
-//Return true if the type provided by the argument is the type of the value v, otherwise return false
+// The parameter is provided with a type tag,
+// Return true if the type provided by the argument is the type of the value v, otherwise return false
 func (v *Value) IsWhichNumType(numberType NumberType) bool {
 	if nt, ok := v.WhichNumType(); ok && nt == numberType {
 		return true
@@ -129,38 +129,38 @@ func (v *Value) IsWhichNumType(numberType NumberType) bool {
 	return false
 }
 
-//Determine whether v represents a variable of type uint
-//Return true if it is a Uint type, otherwise return false
+// Determine whether v represents a variable of type uint
+// Return true if it is a Uint type, otherwise return false
 func (v *Value) IsUint() bool {
 	return v.IsWhichNumType(Uint)
 }
 
-//Determine whether v represents a variable of type int
-//Return true if it is a int type, otherwise return false
+// Determine whether v represents a variable of type int
+// Return true if it is a int type, otherwise return false
 func (v *Value) IsInt() bool {
 	return v.IsWhichNumType(Int)
 }
 
-//Determine whether v represents a variable of type byte
-//Return true if it is a byte type, otherwise return false
+// Determine whether v represents a variable of type byte
+// Return true if it is a byte type, otherwise return false
 func (v *Value) IsUint8() bool {
 	return v.IsWhichNumType(Uint8)
 }
 
-//Determine whether v represents a variable of type int8
-//Return true if it is a int8 type, otherwise return false
+// Determine whether v represents a variable of type int8
+// Return true if it is a int8 type, otherwise return false
 func (v *Value) IsInt8() bool {
 	return v.IsWhichNumType(Int8)
 }
 
-//Determine whether v represents a variable of type bool
-//Return true if it is a bool type, otherwise return false
+// Determine whether v represents a variable of type bool
+// Return true if it is a bool type, otherwise return false
 func (v *Value) IsFloat64() bool {
 	return v.IsWhichNumType(Float64)
 }
 
-//Because the user-inputted a may not be a numeric type, there may be an assignment error.
-//Only accept five types uint int int8 uint8 float64
+// Because the user-inputted a may not be a numeric type, there may be an assignment error.
+// Only accept five types uint int int8 uint8 float64
 func (v *Value) SetAsNumber(a interface{}) error {
 	var value = NewValue()
 	value.SetValue(a)
@@ -171,27 +171,34 @@ func (v *Value) SetAsNumber(a interface{}) error {
 	return errors.New("a not number type")
 }
 
+// Assign a value to the variable v, the assignment type is float64
 func (v *Value) SetAsFloat64(f float64) {
 	v.value = f
 }
 
+// Assign a value to the variable v, the assignment type is int
 func (v *Value) SetAsInt(I int) {
 	v.value = I
 }
 
+// Assign a value to the variable v, the assignment type is uint
 func (v *Value) SetAsUint(I uint) {
 	v.value = I
 }
 
+// Assign a value to the variable v, the assignment type is int8
 func (v *Value) SetAsInt8(I int8) {
 	v.value = I
 }
 
+// Assign a value to the variable v, the assignment type is byte
 func (v *Value) SetAsUint8(I uint8) {
 	v.value = I
 }
 
-//会自动将int8，uint8类型转换，float和uint不支持，因为存在危险
+// If the variable v can be returned as an int type, the value is returned as an int,
+// and the second error return value returns nil
+// Returns 0 if the int type cannot be returned, and the second return value returns the corresponding error.
 func (v *Value) GetAsInt() (result int, err error) {
 	err = nil
 	switch a := v.value.(type) {
@@ -208,6 +215,8 @@ func (v *Value) GetAsInt() (result int, err error) {
 	return
 }
 
+// If the variable v can be returned as an int type, the value is returned as an int,
+// otherwise the largest integer is returned.
 func (v *Value) GetAsIntIgnore() (result int) {
 	switch a := v.value.(type) {
 	case int:
@@ -217,11 +226,14 @@ func (v *Value) GetAsIntIgnore() (result int) {
 	case uint8:
 		result = int(a)
 	default:
-		result = int(^uint(0) >> 1)		//返回一个最大值
+		result = int(^uint(0) >> 1) //返回一个最大值
 	}
 	return
 }
 
+// If the variable v can be returned as an uint type, the value is returned as an uint,
+// and the second error return value returns nil
+// Returns 0 if the uint type cannot be returned, and the second return value returns the corresponding error.
 func (v *Value) GetAsUint() (result uint, err error) {
 	err = nil
 	switch a := v.value.(type) {
@@ -236,6 +248,8 @@ func (v *Value) GetAsUint() (result uint, err error) {
 	return
 }
 
+// If the variable v can be returned as an uint type, the value is returned as an uint,
+// otherwise the largest unsigned integer is returned.
 func (v *Value) GetAsUintIgnore() (result uint) {
 	switch a := v.value.(type) {
 	case uint:
@@ -243,11 +257,14 @@ func (v *Value) GetAsUintIgnore() (result uint) {
 	case uint8:
 		result = uint(a)
 	default:
-		result = ^uint(0) >> 1			//无符号最大值
+		result = ^uint(0) >> 1 //无符号最大值
 	}
 	return
 }
 
+// If the variable v can be returned as an int8 type, the value is returned as an int8,
+// and the second error return value returns nil
+// Returns 0 if the int8 type cannot be returned, and the second return value returns the corresponding error.
 func (v *Value) GetAsInt8() (result int8, err error) {
 	err = nil
 	switch a := v.value.(type) {
@@ -260,6 +277,9 @@ func (v *Value) GetAsInt8() (result int8, err error) {
 	return
 }
 
+// If the variable v can be returned as an byte type, the value is returned as an byte,
+// and the second error return value returns nil
+// Returns 0 if the byte type cannot be returned, and the second return value returns the corresponding error.
 func (v *Value) GetAsUint8() (result uint8, err error) {
 	err = nil
 	switch a := v.value.(type) {
@@ -272,6 +292,9 @@ func (v *Value) GetAsUint8() (result uint8, err error) {
 	return
 }
 
+// If the variable v can be returned as an float64 type, the value is returned as an float64,
+// and the second error return value returns nil
+// Returns 0 if the float64 type cannot be returned, and the second return value returns the corresponding error.
 func (v *Value) GetAsFloat64() (result float64, err error) {
 	err = nil
 	if _, ok := v.WhichNumType(); ok {
@@ -294,6 +317,8 @@ func (v *Value) GetAsFloat64() (result float64, err error) {
 	return
 }
 
+// If the variable v can be returned as an float64 type, the value is returned as an float64,
+// otherwise the largest unsigned integer will be converted to a float64 type return
 func (v *Value) GetAsFloat64Ignore() (result float64) {
 	if _, ok := v.WhichNumType(); ok {
 		switch a := v.value.(type) {
@@ -308,17 +333,17 @@ func (v *Value) GetAsFloat64Ignore() (result float64) {
 		case int8:
 			result = float64(a)
 		default:
-			result = float64(int(^uint(0)>>1))			//返回一个int下的最大整数吧
+			result = float64(int(^uint(0) >> 1)) //返回一个int下的最大整数吧
 		}
 	}
 	return
 }
 
-//end of number
+// end of number
 
-//begin null
+// begin null
 
-//if v.value equal nil ,return true
+// if v.value equal nil ,return true
 func (v *Value) IsNull() bool {
 	if v.value == nil {
 		return true
@@ -326,17 +351,21 @@ func (v *Value) IsNull() bool {
 	return false
 }
 
+// Set the value v to nil
 func (v *Value) SetNull() {
 	v.value = nil
 }
 
-//begin bool
+// begin bool
 
+// Return true if the value v can represent a boolean type, otherwise return false
 func (v *Value) IsBool() bool {
 	_, ok := v.value.(bool)
 	return ok
 }
 
+// If the value v can represent a Boolean type then the first return value returns the value represented by v,
+// and the second error return value returns nil
 func (v *Value) GetAsBool() (result bool, err error) {
 	if a, ok := v.value.(bool); ok {
 		return a, nil
@@ -344,6 +373,7 @@ func (v *Value) GetAsBool() (result bool, err error) {
 	return false, errors.New("can not get a bool type")
 }
 
+// set the value v to b
 func (v *Value) SetAsBool(b bool) {
 	if b {
 		v.value = true
@@ -355,17 +385,21 @@ func (v *Value) SetAsBool(b bool) {
 //end of bool
 
 //begin Object
+
+// set the value v to a
 func (v *Value) SetAsObject(a JsObject) {
 	v.value = a
 }
 
-//Determine whether v represents a variable of type Object
-//Return true if it is a Object type, otherwise return false
+// Determine whether v represents a variable of type Object
+// Return true if it is a Object type, otherwise return false
 func (v *Value) IsObject() bool {
 	_, ok := v.value.(JsObject)
 	return ok
 }
 
+// If the value v can represent a JsObject type then the first return value returns the value represented by v,
+// and the second error return value returns nil
 func (v *Value) GetAsObject() (result JsObject, err error) {
 	err = nil
 	if a, ok := v.value.(JsObject); ok {
@@ -377,8 +411,9 @@ func (v *Value) GetAsObject() (result JsObject, err error) {
 	return
 }
 
-//这个是为了方便用户调用，忽略error
-//只有容器才提供这样的方法
+// User-friendly, this method ignores error
+// If the variable v can be returned as an JsObject type, the value is returned as an JsObject,
+// otherwise nil will return
 func (v *Value) GetAsObjectIgnore() JsObject {
 	if a, ok := v.value.(JsObject); ok {
 		return a
@@ -396,6 +431,8 @@ func (v *Value) IsSlice() bool {
 	return ok
 }
 
+// If the value v can represent a []*Value type then the first return value returns the value represented by v,
+// and the second error return value returns nil
 func (v *Value) GetAsSlice() (result []*Value, err error) {
 	err = nil
 	if a, ok := v.value.([]*Value); ok {
@@ -407,8 +444,9 @@ func (v *Value) GetAsSlice() (result []*Value, err error) {
 	return
 }
 
-//忽略error方便用户调用
-//只有容器才提供这样的方法
+// User-friendly, this method ignores error
+// If the variable v can be returned as an []*Value type, the value is returned as an []*Value,
+// otherwise nil will return
 func (v *Value) GetAsSliceIgnore() []*Value {
 	if a, ok := v.value.([]*Value); ok {
 		return a
@@ -416,6 +454,7 @@ func (v *Value) GetAsSliceIgnore() []*Value {
 	return nil
 }
 
+// Set the value v to s
 func (v *Value) SetAsSlice(s []*Value) {
 	v.value = s
 }

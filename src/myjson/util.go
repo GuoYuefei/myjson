@@ -37,8 +37,11 @@ func CheckNTFN(str string) (NumberType, *Value){
 	}
 }
 
+//处理value的值，将value按照不同情况识别，
+//并按照其情况处理value的去向问题
 func PutValue(sa *StackAnaly,value *Value) {
 	if sa.IsSign().GetWT() == TColon {
+		//value是对象里的值
 		//这里是冒号情况下value的情况，需要让：出栈
 		if sa.State.GetOOA() {
 			//其实一定在对象里的，冒号是不会在数组里出现的
@@ -46,6 +49,7 @@ func PutValue(sa *StackAnaly,value *Value) {
 		}
 		sa.Pop() //冒号pop出来
 	} else if sa.IsSign().GetWT() == TComma && !sa.State.GetOOA() {
+		//value是作为数组中的元素的
 		//不在对象中的逗号
 		//这里Pop出来有Push回去低效率了，以后看到修复
 		a := sa.State.Pop().GetAsSliceIgnore()
@@ -53,7 +57,7 @@ func PutValue(sa *StackAnaly,value *Value) {
 		sa.State.Push(NewVal(a))
 		sa.Pop() //逗号pop出来
 	} else if sa.IsSign().GetWT() == TSquareL {
-		//数组的第一个元素
+		//value是数组的第一个元素
 		a := sa.State.Pop().GetAsSliceIgnore()
 		a = append(a, value)
 		sa.State.Push(NewVal(a))
@@ -82,6 +86,7 @@ func CompressJson(bs []byte) []byte {
 	return []byte(str)
 }
 
+//还没有完成，将来肯定需要的函数
 func FormatJson(bs []byte) []byte {
 	str := string(bs)
 	//做一些format的事情
