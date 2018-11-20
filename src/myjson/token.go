@@ -55,7 +55,6 @@ func GetSign(sign []byte,flag byte) *Sign {
 		} else {
 			s = newSign2(StaNone, TQuotation)
 		}
-		flagQuo = !flagQuo //遇到一次”就取反一次
 	case ":":
 		s = newSign2(StaValue, TColon)
 	case ",":

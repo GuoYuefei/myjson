@@ -96,13 +96,13 @@ func (v *Value) IsNumber() bool {
 func (v *Value) WhichNumType() (NumberType, bool) {
 	var result NumberType = Null
 	switch v.value.(type) {
-	case int:
+	case uint8:
 		result = Uint8
 	case uint:
 		result = Uint
 	case int8:
 		result = Int8
-	case uint8:
+	case int:
 		result = Int
 	case float64:
 		result = Float64
@@ -433,7 +433,7 @@ func (v *Value) IsSlice() bool {
 
 // If the value v can represent a []*Value type then the first return value returns the value represented by v,
 // and the second error return value returns nil
-func (v *Value) GetAsSlice() (result []*Value, err error) {
+func (v *Value) GetAsSlice() (result Slice, err error) {
 	err = nil
 	if a, ok := v.value.([]*Value); ok {
 		result = a
@@ -447,7 +447,7 @@ func (v *Value) GetAsSlice() (result []*Value, err error) {
 // User-friendly, this method ignores error
 // If the variable v can be returned as an []*Value type, the value is returned as an []*Value,
 // otherwise nil will return
-func (v *Value) GetAsSliceIgnore() []*Value {
+func (v *Value) GetAsSliceIgnore() Slice {
 	if a, ok := v.value.([]*Value); ok {
 		return a
 	}
@@ -455,7 +455,7 @@ func (v *Value) GetAsSliceIgnore() []*Value {
 }
 
 // Set the value v to s
-func (v *Value) SetAsSlice(s []*Value) {
+func (v *Value) SetAsSlice(s Slice) {
 	v.value = s
 }
 

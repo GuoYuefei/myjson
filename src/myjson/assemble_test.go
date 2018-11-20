@@ -33,6 +33,7 @@ func TestAssemble1(t *testing.T) {
 func TestAssemble2(t *testing.T) {
 	//,\"age\":\"12\"
 	str2 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":[\"33\",\"44\"]}"
+	clearAllStack()
 	var bs []byte = make([]byte,0,20)
 	bs = append(bs, []byte(str2)...)
 	for _, b := range bs {
@@ -47,6 +48,7 @@ func TestAssemble2(t *testing.T) {
 
 func TestAssemble3(t *testing.T) {
 	str3 := "{\"name\":\"gyf\",\"age\":12,\"sex\":true,\"abc\":null,\"ids\":[\"33\",\"44\"],\"ids1\":{\"id1\":32,\"id2\":111}}"
+	clearAllStack()
 	var bs []byte = make([]byte,0,20)
 	bs = append(bs, []byte(str3)...)
 	for _, b := range bs {
@@ -68,6 +70,7 @@ func TestAssemble3(t *testing.T) {
 
 //测试字符串来自文件
 func TestAssembleFile(t *testing.T) {
+	clearAllStack()
 	bs, err := ioutil.ReadFile("./xx.json")
 	if err != nil {
 		t.Error("读取文件失败")

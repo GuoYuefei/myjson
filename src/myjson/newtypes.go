@@ -18,43 +18,49 @@ const (
 	Str
 )
 
-//定义一个别名，这个类型是一个js的对象，实际上就是js对象该有的样子
-//有一个点可以确定map的value必须是Value类型的，从外层看，这是一个典型的递归结构
+// Define an alias, this type is a js object, in fact, is what the js object should look like
+// There is a point to determine that the value of the map must be of type Value. In fact,
+// you can think of this type as a recursive structure.
 type JsObject = map[string]*Value
 
-//有一个点可以确定，切片中的数据必须是Value类型的，这是一个递归的结构
+// There is a point to determine that the data in the slice must be of type Value
+// it can be thought of as a recursive structure.
 type Slice = []*Value
 
 //----------这个是token.go需要定义的数据-------------------------
-//忽然返现定义token前需要先定义状态
+
+//当前字符期待哪个字符的出现
+//A status flag required to analyze a node, indicating which character the current node value expects to appear
 type Status = int
 
 const (
 	//已经绝望的状态  啥都不期待了
 	StaNone Status = iota
-	//期待key
+	//expects key
 	StaKey
-	//期待Value
+	//expects Value
 	StaValue
-	//期待大括号
+	//expects }
 	StaCloBrace
-	//期待双引号
+	//expects "
 	StaQuotation
-	//期待中括号
+	//expects ]
 	StaSquare
 )
 
-//这个是包内全局变量，用于记录“\"”是否被期待，因为这个部分前后，想{}[]是不同字符成对出现的
-//外部禁止访问，这样会导致不安全
-var flagQuo = false
 
-//-----------还可以区分{}[]:," key value
+
+// As a unique identifier for a keyword, you can distinguish {}[]:,"
 type WhatsType = int
 const (
 	TNone WhatsType = iota
+	//左大括号
 	TBracesL
+	//右大
 	TBracesR
+	//中左
 	TSquareL
+	//中右括号
 	TSquareR
 	//引号
 	TQuotation

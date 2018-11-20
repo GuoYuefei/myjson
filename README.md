@@ -54,7 +54,7 @@ func main() {
 
 ## License
 
-Eclipse Public License 2.0
+GNU Lesser General Public License v3.0 	(LGPLv3.0)
 
 ## Preface
 
