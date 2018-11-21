@@ -13,8 +13,7 @@ const (
 	Float64
 	Array
 	Object
-	True
-	False
+	Bool
 	Str
 )
 

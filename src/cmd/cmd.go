@@ -26,4 +26,21 @@ func main() {
 	fmt.Println(int(^uint(0)>>1))
 	fmt.Println(myjson.ParseParam("name.age"))
 	fmt.Println(strings.SplitAfter("{    \"name\"  :\"qqq\"  }","\""))
+	dd()
+}
+
+type vv struct {
+	A int
+}
+
+type ss struct {
+	Data *[]*vv
+}
+
+func dd() {
+	v := &vv{1}
+	vs := make([]*vv,0,10)
+	s := &ss{&vs}
+	*s.Data = append(*s.Data, v)
+	fmt.Println((*(s.Data))[0].A)
 }

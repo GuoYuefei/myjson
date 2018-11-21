@@ -103,6 +103,13 @@ func (s *StackAnaly) PopWithoutCheck() byte {
 	return b
 }
 
+//从栈顶删除元素，在不需要元素返回的时候可以调用这个函数，效率快
+func (s *StackAnaly) DeleteN(n int) {
+	if s.top >= n-1 {
+		s.top = s.top - n
+	}
+}
+
 func (s *StackAnaly) Top() byte {
 	if s.IsEmpty() {
 		fmt.Errorf("栈为空！" )
