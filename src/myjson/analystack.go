@@ -67,11 +67,11 @@ func (s *StackAnaly) IsEmpty() bool {
 
 func (s *StackAnaly) Push(b byte) {
 	s.PushWithoutCheck(b)
-	switch string([]byte{b}) {
-	case "\"":
+	switch b {
+	case '"':
 		//fmt.Println("wo jin lai le 0")
 		s.flag = s.flag ^ 0x40			//每次压入一个"时，第二位标志位取反
-	case "[":
+	case '[':
 		s.flag = s.flag | 0x80			//[设标志位
 	}
 	//fmt.Println(s.IsSign())
