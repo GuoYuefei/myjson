@@ -148,8 +148,8 @@ KEYWORD2:
 	//push完后分析状态
 	//如果是关键字的话
 
-	if sign.GetStatus() == StaCloBrace {
-		//当期待}的时候，接下来的东西在对象中
+	if sign.GetWT() == TBracesL {
+		//开始一个左大括号的时候，接下来的东西在对象中
 		jsob := make(JsObject)
 		//这个stack实际上就是s对象里面的
 		//将jsob封装成value放入栈中
@@ -157,7 +157,8 @@ KEYWORD2:
 		return
 	}
 
-	if sign.GetStatus() == StaSquare {
+	if sign.GetWT() == TSquareL {
+		//当开始一个左中括号的时候，接下来的内容在一个数组里面
 		//fmt.Println(string([]byte{s.Top()}))
 		//当期待]的时候，接下来的东西在数组中
 		array := make([]*Value,0,10)

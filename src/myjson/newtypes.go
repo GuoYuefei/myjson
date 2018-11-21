@@ -35,22 +35,22 @@ type Slice = []*Value
 
 //当前字符期待哪个字符的出现
 //A status flag required to analyze a node, indicating which character the current node value expects to appear
-type Status = int
-
-const (
-	//已经绝望的状态  啥都不期待了
-	StaNone Status = iota
-	//expects key
-	StaKey
-	//expects Value
-	StaValue
-	//expects }
-	StaCloBrace
-	//expects "
-	StaQuotation
-	//expects ]
-	StaSquare
-)
+//type Status = int
+//
+//const (
+//	//已经绝望的状态  啥都不期待了
+//	StaNone Status = iota
+//	//expects key
+//	StaKey
+//	//expects Value
+//	StaValue
+//	//expects }
+//	StaCloBrace
+//	//expects "
+//	StaQuotation
+//	//expects ]
+//	StaSquare
+//)
 
 
 
