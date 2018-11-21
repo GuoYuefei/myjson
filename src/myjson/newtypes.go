@@ -1,5 +1,10 @@
 package myjson
 
+
+
+//------------一些设置常量---------------
+const NumLayer int = 4				//一般不会超过四层嵌套，节约内存
+
 //----------这个是jsonValue.go需要定义的简单结构---------------
 type NumberType int
 

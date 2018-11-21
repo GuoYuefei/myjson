@@ -3,7 +3,7 @@ package myjson
 //终于到组装的底部了，可能零件还需要改动，但总的来说还是没问题的
 var s *StackAnaly
 var sState *Stack
-var ss *StackAnaly			//辅助栈，出栈的时候倒序
+//var ss *StackAnaly			//辅助栈，出栈的时候倒序
 var keyStrs *StackString			//永远只有一个key游离在外面
 
 //为什么我感觉还需要一个string的栈啊，一个类型自己写个栈，我都累了，这样重复代码太多了，使用Value类型包装的栈用起来有太麻烦
@@ -11,7 +11,7 @@ var keyStrs *StackString			//永远只有一个key游离在外面
 func init() {
 	sState = NewStack()
 	s = NewStackAnalyByStack(sState)
-	ss = NewStackAnaly()
+	//ss = NewStackAnaly()
 	keyStrs = NewStackString()
 }
 
@@ -43,6 +43,10 @@ func init() {
 //如果读到的是json的关键字{}【】等等就返回true
 //这个函数只负责处理keyWord
 func delChar(b byte) {
+	//不在字符串状态下的空格换行等等字符不判定，不压栈
+	if s.GetFlag()&0x40 == 0x00 && (b == ' ' || b == '\n' || b == '\t' || b == '\r') {
+		return
+	}
 	s.Push(b)
 
 	sign := s.IsSign()
@@ -67,20 +71,25 @@ func delChar(b byte) {
 			goto KEYWORD1
 		}
 
-
 		//这个时候我们确定这里的值就是number，true，false，null了
 		//当s.IsSign.GetWT ！= TNone就认为value结束了，下一个肯定是标志符了
-		for s.IsSign().GetWT() == TNone {
-			//这里还需要分} ]这两种情况，因为这时候分别是一个对象和数组的结束
-			//如果是} ]还需要跳转到} ]出执行
+		//for s.IsSign().GetWT() == TNone {
+		//	//这里还需要分} ]这两种情况，因为这时候分别是一个对象和数组的结束
+		//	//如果是} ]还需要跳转到} ]出执行
+		//
+		//	//先取出变量的字符串形式
+		//	ss.PushWithoutCheck(s.Pop())
+		//}
+		//for !ss.IsEmpty() {
+		//	temp = temp + string([]byte{ss.Pop()})
+		//}
 
-			//先取出变量的字符串形式
-			ss.PushWithoutCheck(s.Pop())
-		}
-		for !ss.IsEmpty() {
-			temp = temp + string([]byte{ss.Pop()})
-		}
-		_, value := CheckNTFN(temp)
+		//修改，该代码代替上面两个循环的注释代码，取得最终string
+		var i int
+		for i = 0; s.IsSignN(i).GetWT() == TNone; i++ {}
+		temp = string(s.PopN(i))
+
+		_, value := checkNTFN(temp)
 		putValue(s, value)
 		s.PushWithoutCheck(v)  		//还原} ] ,
 		goto KEYWORD2			//如果是] }那么还需要处理
@@ -98,14 +107,21 @@ KEYWORD1:
 		var tempStr = ""
 		s.DeleteN(1)			//右引号删除
 		//在没有碰到左引号时认为都是字符串里的东西
-		for s.IsSign().GetWT() != TQuotation {
-			//当栈顶元素不是引号时一直弹出到ss中
-			ss.PushWithoutCheck(s.Pop())
-		}
-		s.DeleteN(1)		//pop -> DeleteN
-		for !ss.IsEmpty() {
-			tempStr = tempStr + string([]byte{ss.Pop()})
-		}
+		//for s.IsSign().GetWT() != TQuotation {
+		//	//当栈顶元素不是引号时一直弹出到ss中
+		//	ss.PushWithoutCheck(s.Pop())
+		//}
+		//for !ss.IsEmpty() {
+		//	tempStr = tempStr + string([]byte{ss.Pop()})
+		//}
+
+		//修改，该代码代替上面两个循环的注释代码
+		var i int
+		for i = 0; s.IsSignN(i).GetWT() != TQuotation; i++ {}
+		tempStr = string(s.PopN(i))
+
+
+		s.DeleteN(1)		//pop -> DeleteN 删除左引号
 		//接下来就要判定是key还是value了
 		//当前栈顶{ ,不在数组中的逗号key
 		//当前栈顶: 在数组中的的逗号value 还有[
@@ -205,7 +221,7 @@ KEYWORD2:
 }
 
 func clearAllStack() {
-	ss.Clear()
+	//ss.Clear()
 	keyStrs.Clear()
 	s.Clear()			//sState在内部被Clear了
 }

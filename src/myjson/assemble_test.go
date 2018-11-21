@@ -10,7 +10,7 @@ import (
 
 func TestAssemble1(t *testing.T) {
 	//str := "{\"name\":\"gyf\",\"age\":\"12\"}"
-	str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\",\"id2\":\"2\"}}"
+	str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1234567890\",\"id2\":\"2\"}}"
 	var bs []byte = make([]byte,0,20)
 	bs = append(bs, []byte(str1)...)
 	for _, b := range bs {
@@ -23,7 +23,7 @@ func TestAssemble1(t *testing.T) {
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["ids"].GetAsObjectIgnore()["id1"].GetAsStringIgnore())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["name"].GetAsStringIgnore())
 	fmt.Println(s.Size(),len(str1))
-	fmt.Println(s.Pop(),s.Pop(),s.Pop(),s.Pop(),s.Pop())			//{--123  }--125没单出s 58--:
+	//fmt.Println(s.Pop(),s.Pop(),s.Pop(),s.Pop(),s.Pop())			//{--123  }--125没单出s 58--:
 	//s.Push([]byte("\"")[0])
 	//fmt.Println(s.GetFlag() & 0x40)
 	//delChar([]byte("{")[0])
@@ -32,7 +32,7 @@ func TestAssemble1(t *testing.T) {
 
 func TestAssemble2(t *testing.T) {
 	//,\"age\":\"12\"
-	str2 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":[\"33\",\"44\"]}"
+	str2 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":[\"1234567890\",\"44\"]}"
 	clearAllStack()
 	var bs []byte = make([]byte,0,20)
 	bs = append(bs, []byte(str2)...)
@@ -60,7 +60,7 @@ func TestAssemble3(t *testing.T) {
 	fmt.Println(s.data,s.Size(),len(str3))
 	v, err := s.State.Top().GetAsObjectIgnore()["sex"].GetAsBool()
 	if err != nil {
-		t.Error("测试失败")
+		t.Error(err)
 	}
 	if v {
 		fmt.Println(v)
@@ -76,8 +76,8 @@ func TestAssembleFile(t *testing.T) {
 		t.Error("读取文件失败")
 		panic(err)
 	}
-	bs = CompressJson(bs)
-	fmt.Println(string(bs))
+	//bs = CompressJson(bs)
+	//fmt.Println(string(bs))
 	for _, b := range bs {
 		delChar(b)
 	}
@@ -88,7 +88,7 @@ func TestAssembleFile(t *testing.T) {
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"].GetAsSliceIgnore()[0].GetAsSliceIgnore()[3].GetAsStringIgnore())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key6"].GetAsObjectIgnore()["key8"].GetAsObjectIgnore()["key9"].GetAsStringIgnore())
 	fmt.Println(s.data,s.Size(),len(string(bs)))
-	fmt.Println(ss.data,s.Size())
+	//fmt.Println(ss.data,s.Size())
 	fmt.Println(keyStrs.data,keyStrs.Size())
 	fmt.Println(sState.data,sState.Size())
 	//fmt.Println(s.State.data,s.State.Size())

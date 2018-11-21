@@ -1,6 +1,8 @@
 package myjson
 
-import "fmt"
+import (
+	"fmt"
+)
 
 //这是一个分析栈，json其实就是在分析一个一个的字符
 ///嗯。。可能我要重复造轮子了，还是打算自己写个栈 针对byte类型
@@ -36,7 +38,7 @@ type StackAnaly struct {
 	//这是一个功能标志
 	//1111,1111 从左往右一次编号01234567
 	//,0号，是否在[]中，1：如果是”，“号所期待的下一个值是value，0：如果不是，则期待key。
-	//"1号，栈中是否只有奇数个”\"“,1:如果是则期待的是下一个”，0：如果不是，啥也不期待，继承上一个期待
+	//"1号，栈中是否只有奇数个”\"“,1:如果是则期待的是下一个” 处于接收string的状态下，0：如果不是，不在接收string的状态
 	flag byte
 	//这个栈中存有当前元素应该在对象中还是数组中，实在在什么对象中什么数组中
 	State *Stack
@@ -52,7 +54,7 @@ func NewStackAnaly() *StackAnaly {
 }
 
 func NewStackAnalyByStack(s *Stack) *StackAnaly {
-	return &StackAnaly{make([]byte, 0, 50), -1, 0, s}
+	return &StackAnaly{make([]byte, 0, 35), -1, 0, s}
 }
 
 //实现StackSer的过程
@@ -93,6 +95,16 @@ func (s *StackAnaly) Pop() byte {
 	return s.PopWithoutCheck()
 }
 
+//标志位暂且没有作用，这个PopN也写成不会withoutCheck的
+func (s *StackAnaly) PopN(n int) []byte {
+	if s.top >= n-1 && n > 0{
+		result := s.data[s.top-n+1:s.top+1]
+		s.top = s.top - n
+		return result
+	}
+	panic("PopN: top < n-1")
+}
+
 func (s *StackAnaly) PopWithoutCheck() byte {
 	if s.IsEmpty() {
 		fmt.Errorf("栈为空！！" )
@@ -107,7 +119,9 @@ func (s *StackAnaly) PopWithoutCheck() byte {
 func (s *StackAnaly) DeleteN(n int) {
 	if s.top >= n-1 {
 		s.top = s.top - n
+		return
 	}
+	panic("DeleteN: top < n-1")
 }
 
 func (s *StackAnaly) Top() byte {
@@ -145,7 +159,16 @@ type Analyser interface {
 
 //查看刚压入的元素是否是标识符 如果是就返回有值的sign，否则就nil
 func (s *StackAnaly) IsSign() *Sign {
-	return GetSign([]byte{s.Top()}, s.flag)
+	//return GetSign([]byte{s.Top()}, s.flag)
+	return s.IsSignN(0)
+}
+
+//n=0时与IsSign同
+//n=1时就是除栈顶以外的第一个元素
+func (s *StackAnaly) IsSignN(n int) *Sign {
+	//flag还是用当前栈顶状态的值
+	//是一个危险的函数，这个可能会越界，没有越界检查。之后看效率要不要添加检查
+	return GetSign(s.data[s.top-n], s.flag)
 }
 
 //置位标识符 使用位
@@ -189,7 +212,7 @@ type Stack struct {
 }
 
 func NewStack() *Stack {
-	return &Stack{make([]*Value, 0,24), -1, true}
+	return &Stack{make([]*Value, 0, NumLayer), -1, true}
 }
 
 func (s *Stack) IsEmpty() bool {
@@ -283,7 +306,7 @@ type StackString struct {
 }
 
 func NewStackString() *StackString {
-	return &StackString{make([]string, 0, 7), -1}
+	return &StackString{make([]string, 0, NumLayer), -1}
 }
 
 func (s *StackString)IsEmpty() bool {

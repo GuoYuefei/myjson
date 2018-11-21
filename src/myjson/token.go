@@ -6,20 +6,20 @@ package myjson
 type Sign struct {
 	//标识符一般是有自己的期待值的，比如说”{“是会期待”}“。 ","是期待key的出现
 	status Status
-	v []byte
+	v byte
 	wt WhatsType
 }
 
 //KEY OR VALUE 出栈时使用
-func NewSign(sta Status, v []byte, whatsType WhatsType) *Sign {
+func NewSign(sta Status, v byte, whatsType WhatsType) *Sign {
 	return &Sign{sta, v, whatsType}
 }
 
 func newSign2(sta Status, whatsType WhatsType) *Sign {
-	return &Sign{sta, make([]byte,0,1), whatsType}
+	return &Sign{sta, 0, whatsType}
 }
 
-func (s *Sign) setV(v []byte) {
+func (s *Sign) setV(v byte) {
 	s.v = v
 }
 
@@ -32,7 +32,7 @@ func (s *Sign) GetWT() WhatsType {
 	return s.wt
 }
 
-func (s *Sign) GetV() []byte {
+func (s *Sign) GetV() byte {
 	return s.v
 }
 
@@ -42,30 +42,31 @@ func (s *Sign) GetStatus() Status {
 
 //根据sign这个字符来判定是否是Sign类型，返回与标志符想对应的*Sign
 //StaNone最终会是继承上一个期待的,
-func GetSign(sign []byte,flag byte) *Sign {
+func GetSign(sign byte,flag byte) *Sign {
 	var s *Sign
-	switch string(sign) {
-	case "{":
-		s = newSign2(StaCloBrace, TBracesL)
-	case "[":
-		s = newSign2(StaSquare, TSquareL)
-	case "\"":
-		if flag & 0x40 == 0x40 {		//当栈中有奇数个引号的时候
-			s = newSign2(StaQuotation, TQuotation)
-		} else {
-			s = newSign2(StaNone, TQuotation)
-		}
-	case ":":
-		s = newSign2(StaValue, TColon)
-	case ",":
+	switch sign {
+	//出现频率应该是最高的放在前面
+	case ',':
 		if flag & 0x80 == 0x80 {		//当在数组里的时候“，”期待的是下一个数组元素
 			s = newSign2(StaValue, TComma)
 		} else {
 			s = newSign2(StaKey, TComma)
 		}
-	case "}":
+	case ':':
+		s = newSign2(StaValue, TColon)
+	case '"':
+		if flag & 0x40 == 0x40 {		//当栈中有奇数个引号的时候
+			s = newSign2(StaQuotation, TQuotation)
+		} else {
+			s = newSign2(StaNone, TQuotation)
+		}
+	case '{':
+		s = newSign2(StaCloBrace, TBracesL)
+	case '[':
+		s = newSign2(StaSquare, TSquareL)
+	case '}':
 		s = newSign2(StaNone, TBracesR)
-	case "]":
+	case ']':
 		s = newSign2(StaNone, TSquareR)
 	default:
 		s = newSign2(StaNone, TNone)

@@ -15,7 +15,8 @@ import (
 // According to the byte array parsed into the corresponding JsObject, if successful, the return value of error is nil, otherwise return the corresponding error
 func GetJsObject(json []byte) (JsObject, error) {
 	clearAllStack()
-	json = CompressJson(json)			//必须先压缩，在识别
+	//json = CompressJson(json) //必须先压缩，在识别
+	//压缩工作已经在delChar中用某种方式做了替代，故而无需压缩
 	for _,b := range json {
 		delChar(b)
 	}

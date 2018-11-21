@@ -43,8 +43,10 @@ func TestGet(t *testing.T) {
 	if e != nil {
 		t.Error("读取失败")
 	}
+	//fmt.Println(string(bytes))
 	var v *Value = Get(bytes, "contributor")
 	fmt.Println(v.GetAsSliceIgnore()[0].GetAsStringIgnore())
+	fmt.Println(Get(bytes, "version").GetAsStringIgnore())
 	v = Get(bytes, "date.year")
 	fmt.Println(v.GetAsIntIgnore())
 	jso, err := GetJsObject(bytes)
@@ -53,4 +55,5 @@ func TestGet(t *testing.T) {
 	}
 	fmt.Println(GetFromJsObject(jso,"date.month").GetAsIntIgnore())
 	fmt.Println(GetFromJsObject(jso, "date.day").GetAsIntIgnore())
+	fmt.Println(GetFromJsObject(jso,"date.datetime").GetAsStringIgnore())
 }

@@ -6,7 +6,7 @@ import (
 )
 
 //在这写一个工具函数，用于判定是否一个字符串的number、true、false、null
-func CheckNTFN(str string) (NumberType, *Value){
+func checkNTFN(str string) (NumberType, *Value){
 	if strings.EqualFold(str, "true") {
 		//不论true还是True还是truE还是怎么样的，不论大小写，都算是true
 		return Bool, NewVal(true)
@@ -69,25 +69,14 @@ func putValue(sa *StackAnaly,value *Value) {
 	}
 }
 
-//压缩json
-//string类型中的空格换行什么的都不能去除
+//高效版压缩json
 func CompressJson(bs []byte) []byte {
-	str := string(bs)
-	//有json字符串规律可知，json的字符串中引号不会出现开头与结尾
-	after := strings.SplitAfter(str, "\"")
-	str = ""
-	for i, v := range after {
-		if i % 2 == 0 {
-			//偶数段一定不是字符串段
-			v = strings.Replace(v, " ","", -1)			//去除空格
-			//去除换行
-			v = strings.Replace(v, "\n","", -1)
-			//windows下还可能有回车
-			v = strings.Replace(v, "\r", "", -1)
-		}
-		str = str + v
-	}
-	return []byte(str)
+	//四个代替法则
+	rp := strings.NewReplacer("\t", "",
+										" ", "",
+										"\n", "",
+										"\r", "")
+	return []byte(rp.Replace(string(bs)))
 }
 
 //还没有完成，将来肯定需要的函数

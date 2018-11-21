@@ -30,17 +30,43 @@ func main() {
 }
 
 type vv struct {
-	A int
+	a interface{}
 }
 
+func (v *vv) setV(a interface{}) {
+	v.a = a
+}
+
+func (v *vv) getvvSlice() []*vv {
+	if a, ok := v.a.([]*vv); ok {
+		return a
+	}
+	return nil
+}
+
+
 type ss struct {
-	Data *[]*vv
+	Data []*vv
 }
 
 func dd() {
-	v := &vv{1}
-	vs := make([]*vv,0,10)
-	s := &ss{&vs}
-	*s.Data = append(*s.Data, v)
-	fmt.Println((*(s.Data))[0].A)
+	//v := &vv{1}
+	vs := make([]*vv, 0, 10)
+	vs = append(vs, &vv{123})
+	//将切片分装成vv类型
+	vvs := &vv{vs}
+
+	s := &ss{make([]*vv, 0, 12)}
+	s.Data = append(s.Data, vvs)
+	fmt.Printf("%p\n", s.Data[0].a)
+	fmt.Println(s.Data[0].getvvSlice())
+	vvvs := s.Data[0].getvvSlice()
+	fmt.Printf("vvvs.poriner1: %p \n", vvvs)
+	vvvs = append(vvvs, &vv{2134214})
+	vvvs[0] = &vv{23232}
+	fmt.Println("vvvs:", vvvs)
+	fmt.Printf("vvvs.poriner2: %p \n", vvvs)
+	fmt.Printf("%p\n", s.Data[0].a)
+	fmt.Println(s.Data[0].getvvSlice())
+	fmt.Println(s.Data[0].getvvSlice()[0])
 }
