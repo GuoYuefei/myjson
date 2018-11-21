@@ -1,7 +1,5 @@
 package myjson
 
-import "fmt"
-
 //终于到组装的底部了，可能零件还需要改动，但总的来说还是没问题的
 var s *StackAnaly
 var sState *Stack
@@ -110,8 +108,8 @@ KEYWORD1:
 			//当前栈顶{ ,不在数组中的逗号key
 			//当前栈顶: 在数组中的的逗号value 还有[
 			//-----------------key-----------------------
-			fmt.Println(s.IsSign())
-			fmt.Println(string([]byte{s.Top()}),s.Size())
+			//fmt.Println(s.IsSign())
+			//fmt.Println(string([]byte{s.Top()}),s.Size())
 			if s.IsSign().GetWT() == TBracesL {
 				//对象的第一个属性key
 				keyStrs.Push(tempStr)
@@ -142,7 +140,7 @@ KEYWORD2:
 		}
 
 		if sign.GetStatus() == StaSquare {
-			fmt.Println(string([]byte{s.Top()}))
+			//fmt.Println(string([]byte{s.Top()}))
 			//当期待]的时候，接下来的东西在数组中
 			array := make([]*Value,0,10)
 			s.State.Push(NewVal(array))
@@ -171,7 +169,7 @@ KEYWORD2:
 
 		if sign.GetWT() == TSquareR {
 			//也一定成立的
-			fmt.Println(string([]byte{s.Top()}))
+			//fmt.Println(string([]byte{s.Top()}))
 			if !s.State.GetOOA() {
 				arr := s.State.Pop().GetAsSliceIgnore()
 				s.Pop()   			//]pop

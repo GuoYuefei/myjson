@@ -1,6 +1,5 @@
 # git 的ignore配置文件
 /.idea/*
 /testFile/*
-/xx.json
 /src/xx.json
 

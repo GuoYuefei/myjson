@@ -1,0 +1,9 @@
+{
+  "name": "solomon",
+  "Addr": 3304,
+  "Array":[1,2,3,4],
+  "ob": {
+    "sex":true,
+    "cc":"cc"
+  }
+}
