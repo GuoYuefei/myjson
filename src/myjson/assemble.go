@@ -51,20 +51,20 @@ func delChar(b byte) {
 
 	sign := s.IsSign()
 
-	if sign.GetWT() == TNone || s.GetFlag()&0x40 == 0x40 {
+	if sign == TNone || s.GetFlag()&0x40 == 0x40 {
 		return
 	}
 	/**
 	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign().GetWT == TNone
 	2、对应的判定这些结束的标志是： ， [
 	 */
-	if a := sign.GetWT(); a == TComma || a == TBracesR || a == TSquareR {
+	if sign == TComma || sign == TBracesR || sign == TSquareR {
 		var temp string	= ""		//先把这些类型的字符串形式拿出来准没错
 		//var strb byte
 		// 将栈顶标识符弹出
 		v := s.PopWithoutCheck()
 
-		if s.IsSign().GetWT() != TNone {
+		if s.IsSign() != TNone {
 			//当标识符pop出来之后，还有关键字的话就不执行这个if中的任何内容
 			s.PushWithoutCheck(v)			//还原s
 			//如果在，}]前面还有关键字，极大可能是引号，但也有可能是其他的
@@ -86,7 +86,7 @@ func delChar(b byte) {
 
 		//修改，该代码代替上面两个循环的注释代码，取得最终string
 		var i int
-		for i = 0; s.IsSignN(i).GetWT() == TNone; i++ {}
+		for i = 0; s.IsSignN(i) == TNone; i++ {}
 		temp = string(s.PopN(i))
 
 		_, value := checkNTFN(temp)
@@ -100,7 +100,7 @@ KEYWORD1:
 
 	//如果是引号的话
 	//且栈的状态标志在string档位，所以所有的字符进来全是string的一部分
-	if sign.GetWT() == TQuotation && s.GetFlag() & 0x40 == 0x00 {
+	if sign == TQuotation && s.GetFlag() & 0x40 == 0x00 {
 
 		//如果接收到下一个引号了,那么就标志着一个字符串的结束
 		//因为第二位标志符号会在第二个”引号来的时候重置
@@ -115,9 +115,9 @@ KEYWORD1:
 		//	tempStr = tempStr + string([]byte{ss.Pop()})
 		//}
 
-		//修改，该代码代替上面两个循环的注释代码
+		//!!!修改，该代码代替上面两个循环的注释代码
 		var i int
-		for i = 0; s.IsSignN(i).GetWT() != TQuotation; i++ {}
+		for i = 0; s.IsSignN(i) != TQuotation; i++ {}
 		tempStr = string(s.PopN(i))
 
 
@@ -128,11 +128,11 @@ KEYWORD1:
 		//-----------------key-----------------------
 		//fmt.Println(s.IsSign())
 		//fmt.Println(string([]byte{s.Top()}),s.Size())
-		if s.IsSign().GetWT() == TBracesL {
+		if s.IsSign() == TBracesL {
 			//对象的第一个属性key
 			keyStrs.Push(tempStr)
 		}
-		if s.IsSign().GetWT() == TComma && sState.GetOOA() {
+		if s.IsSign() == TComma && sState.GetOOA() {
 			keyStrs.Push(tempStr)
 			//s.Pop()			//顺便把，逗号pop出来了
 			s.DeleteN(1)		//pop -> DeleteN
@@ -148,7 +148,7 @@ KEYWORD2:
 	//push完后分析状态
 	//如果是关键字的话
 
-	if sign.GetWT() == TBracesL {
+	if sign == TBracesL {
 		//开始一个左大括号的时候，接下来的东西在对象中
 		jsob := make(JsObject)
 		//这个stack实际上就是s对象里面的
@@ -157,7 +157,7 @@ KEYWORD2:
 		return
 	}
 
-	if sign.GetWT() == TSquareL {
+	if sign == TSquareL {
 		//当开始一个左中括号的时候，接下来的内容在一个数组里面
 		//fmt.Println(string([]byte{s.Top()}))
 		//当期待]的时候，接下来的东西在数组中
@@ -166,7 +166,7 @@ KEYWORD2:
 		return
 	}
 
-	if sign.GetWT() == TBracesR {
+	if sign == TBracesR {
 		//其实下面的判断一定是成立的，暂且找不出不成立的理由
 		if sState.GetOOA() {
 			if sState.Size() == 1 {
@@ -191,7 +191,7 @@ KEYWORD2:
 		return
 	}
 
-	if sign.GetWT() == TSquareR {
+	if sign == TSquareR {
 		//也一定成立的
 		//fmt.Println(string([]byte{s.Top()}))
 		if !sState.GetOOA() {
@@ -206,7 +206,7 @@ KEYWORD2:
 				//该数组作为栈顶数组的元素
 				//s.Pop();			//[pop
 				s.DeleteN(1)		//注释同上 Pop -> DeleteN
-				if s.IsSign().GetWT() == TComma {
+				if s.IsSign() == TComma {
 					//当s栈顶是，
 					//s.Pop()				//把，pop出去
 					s.DeleteN(1)			//注释同上 Pop -> DeleteN
@@ -217,7 +217,6 @@ KEYWORD2:
 			}
 		}
 	}
-
 	return
 }
 
@@ -226,5 +225,3 @@ func clearAllStack() {
 	keyStrs.Clear()
 	s.Clear()			//sState在内部被Clear了
 }
-
-

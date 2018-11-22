@@ -3,8 +3,8 @@ package myjson
 import "testing"
 
 func TestGetSign(t *testing.T) {
-	var sign *Sign = GetSign(',',12)
-	if TComma != sign.GetWT() {
+	var sign *sign = GetSign(',')
+	if TComma != sign.getWT() {
 		t.Error("测试不通过", i)
 	}
 }

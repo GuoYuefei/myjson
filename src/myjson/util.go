@@ -42,7 +42,7 @@ func checkNTFN(str string) (NumberType, *Value){
 //这个只处理非容器Value
 func putValue(sa *StackAnaly,value *Value) {
 	sign := sa.IsSign()
-	if sign.GetWT() == TColon {
+	if sign == TColon {
 		//value是对象里的值
 		//这里是冒号情况下value的情况，需要让：出栈
 		if sa.State.GetOOA() {
@@ -51,7 +51,7 @@ func putValue(sa *StackAnaly,value *Value) {
 		}
 		//sa.Pop() //冒号pop出来
 		sa.DeleteN(1)			// Pop -> DeleteN 注释同上
-	} else if sign.GetWT() == TComma && !sa.State.GetOOA() {
+	} else if sign == TComma && !sa.State.GetOOA() {
 		//value是作为数组中的元素的
 		//不在对象中的逗号
 		//这里Pop出来有Push回去低效率了，以后看到修复
@@ -60,7 +60,7 @@ func putValue(sa *StackAnaly,value *Value) {
 		sa.State.Push(NewVal(a))
 		//sa.Pop() //逗号pop出来
 		sa.DeleteN(1)			//Pop -> DeleteN 注释同上
-	} else if sign.GetWT() == TSquareL {
+	} else if sign == TSquareL {
 		//value是数组的第一个元素
 		a := sa.State.Pop().GetAsSliceIgnore()
 		a = append(a, value)

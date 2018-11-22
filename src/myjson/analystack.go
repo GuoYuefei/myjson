@@ -151,24 +151,39 @@ type StackAnalyser interface {
 
 //栈的分析接口
 type Analyser interface {
-	IsSign() *Sign
+	IsSign() WhatsType
 	SetFlag(b byte)
 	GetFlag() byte
 }
 //需要分析出标志符{}[],":七个
 
 //查看刚压入的元素是否是标识符 如果是就返回有值的sign，否则就nil
-func (s *StackAnaly) IsSign() *Sign {
+func (s *StackAnaly) IsSign() WhatsType {
 	//return GetSign([]byte{s.Top()}, s.flag)
 	return s.IsSignN(0)
 }
 
-//n=0时与IsSign同
-//n=1时就是除栈顶以外的第一个元素
-func (s *StackAnaly) IsSignN(n int) *Sign {
-	//flag还是用当前栈顶状态的值
-	//是一个危险的函数，这个可能会越界，没有越界检查。之后看效率要不要添加检查
-	return GetSign(s.data[s.top-n], s.flag)
+func (s *StackAnaly) IsSignN(n int) (wt WhatsType) {
+	switch s.data[s.top-n] {
+	//出现频率应该是最高的放在前面
+	case ',':
+		wt = TComma
+	case ':':
+		wt = TColon
+	case '"':
+		wt = TQuotation
+	case '{':
+		wt = TBracesL
+	case '[':
+		wt = TSquareL
+	case '}':
+		wt = TBracesR
+	case ']':
+		wt = TSquareR
+	default:
+		wt = TNone
+	}
+	return
 }
 
 //置位标识符 使用位
@@ -230,7 +245,6 @@ func (s *Stack) Push(v *Value) {
 		s.data = append(s.data, v)
 	}
 	s.setOOA()
-
 }
 
 //根据顶层元素置位，当顶层元素发生变化时必须调用
@@ -239,8 +253,8 @@ func (s *Stack)setOOA() {
 	//如果是jsob。那么就置obOrAr为true
 	if v.IsObject() {
 		s.obOrAr = true
+		return
 	}
-
 	if v.IsSlice() {
 		s.obOrAr = false
 	}
@@ -275,14 +289,6 @@ func (s *Stack) Clear() {
 	s.top = -1
 	s.obOrAr = true
 }
-//
-//func (s *Stack) SetTrue() {
-//	s.obOrAr = true
-//}
-//
-//func (s *Stack) SetFalse() {
-//	s.obOrAr = false
-//}
 
 func (s *Stack) GetOOA() bool {
 	return s.obOrAr
@@ -297,7 +303,6 @@ type StackStringer interface {
 	Clear()
 	Size() int
 }
-
 
 //不管了，我在写一个string的栈吧，这样执行速度上将比上面的更加快写
 type StackString struct {

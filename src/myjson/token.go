@@ -3,7 +3,10 @@ package myjson
 //这是一个关于token的包
 //先定义其数据结构，因为其实json是树形结构的，所以token其实有点像树的节点
 
-type Sign struct {
+
+//之前优化简化，后来废弃
+//已废弃
+type sign struct {
 	//标识符一般是有自己的期待值的，比如说”{“是会期待”}“。 ","是期待key的出现
 	//status Status
 	//v byte
@@ -11,12 +14,12 @@ type Sign struct {
 }
 
 //KEY OR VALUE 出栈时使用
-func NewSign(whatsType WhatsType) *Sign {
-	return &Sign{ whatsType}
+func newSign(whatsType WhatsType) *sign {
+return &sign{ whatsType}
 }
 
-func newSign2(whatsType WhatsType) *Sign {
-	return &Sign{whatsType}
+func newSign2(whatsType WhatsType) *sign {
+	return &sign{whatsType}
 }
 
 //func (s *Sign) setV(v byte) {
@@ -28,7 +31,7 @@ func newSign2(whatsType WhatsType) *Sign {
 //	s.status = sta
 //}
 
-func (s *Sign) GetWT() WhatsType {
+func (s *sign) getWT() WhatsType {
 	return s.wt
 }
 
@@ -42,9 +45,9 @@ func (s *Sign) GetWT() WhatsType {
 
 //根据sign这个字符来判定是否是Sign类型，返回与标志符想对应的*Sign
 //StaNone最终会是继承上一个期待的,
-func GetSign(sign byte,flag byte) *Sign {
-	var s *Sign
-	switch sign {
+func GetSign(b byte) *sign {
+	var s *sign
+	switch b {
 	//出现频率应该是最高的放在前面
 	case ',':
 		//if flag & 0x80 == 0x80 {		//当在数组里的时候“，”期待的是下一个数组元素
