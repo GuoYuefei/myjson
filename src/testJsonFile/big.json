@@ -2,8 +2,9 @@
   "name":"myjson",
   "version":"0.0.1",
   "contributor":[
-    "Solomon Guo"
+    "Solomon Guo","xyz zzz","xyz yyy"
   ],
+  "complete":false,
   "date":{
     "datetime":"2018-11-18 14:26",
     "year":2018,
@@ -12,18 +13,7 @@
     "time":{
       "hour":14,
       "minutes":26
-    }
-  },
-  "key11":[
-    ["1","2","3","你好"],
-    [4,5,6]
-  ],
-  "key12":[
-    {
-      "key13":134567
     },
-    {
-      "key14":14567
-    }
-  ]
+    "timearray":[2018,11,18,14,26]
+  }
 }

@@ -51,25 +51,31 @@ func delChar(b byte) {
 
 	sign := s.IsSign()
 
-	if sign == TNone || s.GetFlag()&0x40 == 0x40 {
+	//字符串或者不是标识符时，直接退出函数				en...冒号暂且也没有特殊的事件判断，故而省略
+	if sign == TNone  || s.GetFlag()&0x40 == 0x40 || sign == TColon {
 		return
 	}
+
+
+
 	/**
 	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.IsSign().GetWT == TNone
 	2、对应的判定这些结束的标志是： ， [
 	 */
-	if sign == TComma || sign == TBracesR || sign == TSquareR {
-		var temp string	= ""		//先把这些类型的字符串形式拿出来准没错
-		//var strb byte
+	if (sign == TComma || sign == TBracesR || sign == TSquareR) && s.IsSignN(1) == TNone {
 		// 将栈顶标识符弹出
+		//v := s.PopWithoutCheck()
+
+		////栈顶数起，第二个元素时json关键字
+		//if s.IsSignN(1) != TNone {
+		//	//当标识符pop出来之后，还有关键字的话就不执行这个if中的任何内容
+		//	//s.PushWithoutCheck(v)			//还原s
+		//	//如果在，}]前面还有关键字，极大可能是引号，但也有可能是其他的
+		//	goto KEYWORD1
+		//}
+
 		v := s.PopWithoutCheck()
 
-		if s.IsSign() != TNone {
-			//当标识符pop出来之后，还有关键字的话就不执行这个if中的任何内容
-			s.PushWithoutCheck(v)			//还原s
-			//如果在，}]前面还有关键字，极大可能是引号，但也有可能是其他的
-			goto KEYWORD1
-		}
 
 		//这个时候我们确定这里的值就是number，true，false，null了
 		//当s.IsSign.GetWT ！= TNone就认为value结束了，下一个肯定是标志符了
@@ -87,15 +93,15 @@ func delChar(b byte) {
 		//修改，该代码代替上面两个循环的注释代码，取得最终string
 		var i int
 		for i = 0; s.IsSignN(i) == TNone; i++ {}
-		temp = string(s.PopN(i))
+		temp := s.PopN(i)
 
-		_, value := checkNTFN(temp)
+		_, value := checkNBN(temp)
 		putValue(s, value)
 		s.PushWithoutCheck(v)  		//还原} ] ,
 		goto KEYWORD2			//如果是] }那么还需要处理
 	}
 
-KEYWORD1:
+//KEYWORD1:
 	//-----------------------string(key-value)----------------------------------
 
 	//如果是引号的话
@@ -160,7 +166,7 @@ KEYWORD2:
 	if sign == TSquareL {
 		//当开始一个左中括号的时候，接下来的内容在一个数组里面
 		//fmt.Println(string([]byte{s.Top()}))
-		//当期待]的时候，接下来的东西在数组中
+		//当栈顶为[的时候，接下来的东西在数组中
 		array := make([]*Value,0,10)
 		sState.Push(NewVal(array))
 		return
@@ -179,13 +185,21 @@ KEYWORD2:
 			//s.Pop()				//} pop出来
 			//s.Pop()				//: or ,  pop出来，属性前面肯定有冒号啊
 			//s.Pop()				//{ pop出来
-			s.DeleteN(3)			//注释同上 ，修改 pop -> DeleteN		DeleteN的速度更快
+
+
 			if sState.GetOOA() {
+				s.DeleteN(3)
 				sState.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(jsob)
 			} else {
-				arr := sState.Pop().GetAsSliceIgnore()
-				arr = append(arr, NewVal(jsob))
-				sState.Push(NewVal(arr))
+				//arr := sState.Pop().GetAsSliceIgnore()
+				//arr = append(arr, NewVal(jsob))
+				//sState.Push(NewVal(arr))
+
+				s.DeleteN(2)			//注释同上 ，修改 pop -> DeleteN		DeleteN的速度更快
+
+				//!!替换以上代码，更新切片是Value类型应该做的事情
+				arr := sState.data[sState.top]
+				arr.UpdateSlice(NewVal(jsob))
 			}
 		}
 		return
@@ -211,9 +225,13 @@ KEYWORD2:
 					//s.Pop()				//把，pop出去
 					s.DeleteN(1)			//注释同上 Pop -> DeleteN
 				}
-				temp := sState.Pop().GetAsSliceIgnore()
-				temp = append(temp,NewVal(arr))
-				sState.Push(NewVal(temp))
+				//temp := sState.Pop().GetAsSliceIgnore()
+				//temp = append(temp,NewVal(arr))
+				//sState.Push(NewVal(temp))
+
+				//！！！替换以上代码
+				temp := sState.data[sState.top]
+				temp.UpdateSlice(NewVal(arr))
 			}
 		}
 	}

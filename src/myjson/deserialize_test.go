@@ -56,4 +56,6 @@ func TestGet(t *testing.T) {
 	fmt.Println(GetFromJsObject(jso,"date.month").GetAsIntIgnore())
 	fmt.Println(GetFromJsObject(jso, "date.day").GetAsIntIgnore())
 	fmt.Println(GetFromJsObject(jso,"date.datetime").GetAsStringIgnore())
+	fmt.Println(GetFromJsObject(jso, "key11").GetAsSliceIgnore()[0].GetAsSliceIgnore()[3])
+	fmt.Println(GetFromJsObject(jso, "key12").GetAsSliceIgnore()[1].GetAsObjectIgnore()["key14"])
 }

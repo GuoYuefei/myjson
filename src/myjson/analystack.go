@@ -230,6 +230,7 @@ func NewStack() *Stack {
 	return &Stack{make([]*Value, 0, NumLayer), -1, true}
 }
 
+
 func (s *Stack) IsEmpty() bool {
 	if s.top == -1 {
 		return true

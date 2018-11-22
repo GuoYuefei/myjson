@@ -78,14 +78,18 @@ func TestAssembleFile(t *testing.T) {
 	}
 	//bs = CompressJson(bs)
 	//fmt.Println(string(bs))
+
 	for _, b := range bs {
 		delChar(b)
 	}
 	fmt.Println(s.State.Top().GetAsObjectIgnore())
-	fmt.Println(s.State.Top().GetAsObjectIgnore()["key3"].GetAsSliceIgnore())
-	fmt.Println(s.State.Top().GetAsObjectIgnore()["key4"].GetAsObjectIgnore()["key5"].GetAsInt())
+	fmt.Println("key3 = ",s.State.Top().GetAsObjectIgnore()["key3"].GetAsSliceIgnore())
+	fmt.Println("key4.key5 = ", s.State.Top().GetAsObjectIgnore()["key4"].GetAsObjectIgnore()["key5"].GetAsIntIgnore())
+	//fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"])
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"].GetAsSliceIgnore()[1].GetAsSliceIgnore()[1].GetAsInt())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key11"].GetAsSliceIgnore()[0].GetAsSliceIgnore()[3].GetAsStringIgnore())
+	fmt.Println("key12 = ", s.State.Top().GetAsObjectIgnore()["key12"].GetAsSliceIgnore()[0].GetAsObjectIgnore()["key13"].GetAsIntIgnore())
+
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key6"].GetAsObjectIgnore()["key8"].GetAsObjectIgnore()["key9"].GetAsStringIgnore())
 	fmt.Println(s.data,s.Size(),len(string(bs)))
 	//fmt.Println(ss.data,s.Size())

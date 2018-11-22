@@ -1,6 +1,7 @@
 package myjson
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 )
@@ -37,6 +38,32 @@ func checkNTFN(str string) (NumberType, *Value){
 	}
 }
 
+func checkNBN(bs []byte) (NumberType, *Value) {
+	if bytes.EqualFold(bs,[]byte{'t','r','u','e'}) {
+		return Bool, NewVal(true)
+	} else if bytes.EqualFold(bs, []byte{'f','a','l','s','e'}) {
+		return Bool, NewVal(false)
+	} else if bytes.EqualFold(bs, []byte{'n','u','l','l'}) {
+		return Null, NewValue()
+	} else {
+		if !(bytes.Index(bs, []byte{'.'}) >= 0) {
+			v, err := strconv.Atoi(string(bs))
+			if err == nil {
+				return Int, NewVal(v)
+			} else {
+				return Null, NewValue()
+			}
+		} else {
+			v, err := strconv.ParseFloat(string(bs), 64)
+			if err == nil {
+				return Float64, NewVal(v)
+			} else {
+				return Null, NewValue()
+			}
+		}
+	}
+}
+
 //处理value的值，将value按照不同情况识别，
 //并按照其情况处理value的去向问题
 //这个只处理非容器Value
@@ -55,16 +82,26 @@ func putValue(sa *StackAnaly,value *Value) {
 		//value是作为数组中的元素的
 		//不在对象中的逗号
 		//这里Pop出来有Push回去低效率了，以后看到修复
-		a := sa.State.Pop().GetAsSliceIgnore()
-		a = append(a, value)
-		sa.State.Push(NewVal(a))
+		//a := sa.State.Pop().GetAsSliceIgnore()
+		//a = append(a, value)
+		//sa.State.Push(NewVal(a))
+
+		a := sa.State.data[sa.State.top]
+		a.UpdateSlice(value)
+
+
 		//sa.Pop() //逗号pop出来
 		sa.DeleteN(1)			//Pop -> DeleteN 注释同上
 	} else if sign == TSquareL {
 		//value是数组的第一个元素
-		a := sa.State.Pop().GetAsSliceIgnore()
-		a = append(a, value)
-		sa.State.Push(NewVal(a))
+		//a := sa.State.Pop().GetAsSliceIgnore()
+		//a = append(a, value)
+		//sa.State.Push(NewVal(a))
+
+		a := sa.State.data[sa.State.top]
+		a.UpdateSlice(value)
+
+
 		//不用pop，[号是匹配符号
 	}
 }

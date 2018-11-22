@@ -444,6 +444,8 @@ func (v *Value) GetAsSlice() (result Slice, err error) {
 	return
 }
 
+
+
 // User-friendly, this method ignores error
 // If the variable v can be returned as an []*Value type, the value is returned as an []*Value,
 // otherwise nil will return
@@ -452,6 +454,14 @@ func (v *Value) GetAsSliceIgnore() Slice {
 		return a
 	}
 	return nil
+}
+
+//用于更新Slice
+func (v *Value) UpdateSlice(vv ...*Value) {
+	if sv, ok := v.value.(Slice); ok {
+		sv = append(sv, vv...)
+		v.value = sv
+	}
 }
 
 // Set the value v to s
