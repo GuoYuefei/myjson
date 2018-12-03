@@ -10,9 +10,9 @@
 
 MYJSON is a Go package that provides a fast and simple way to get values from a json document.
 
-- [Getting Started](#Getting Started)
+- [Getting Started](#getting-started)
   + [Instll](#Install)
-  + [Usage Example](#Usage Example)
+  + [Usage Example](#usage-example)
 
 - [Lisence](#License)
 - [Preface](#Preface)
