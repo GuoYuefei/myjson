@@ -11,12 +11,12 @@ import (
 
 //基础函数，底层函数，也比较好用
 //根据字节数组解析成相应的JsObject，成功error就返回nil，否则返回相应错误
+
 // Basic functions, the underlying functions, also easier to use
 // According to the byte array parsed into the corresponding JsObject, if successful, the return value of error is nil, otherwise return the corresponding error
 func GetJsObject(json []byte) (JsObject, error) {
 	clearAllStack()
-	//json = CompressJson(json) //必须先压缩，在识别
-	//压缩工作已经在delChar中用某种方式做了替代，故而无需压缩
+
 	for _,b := range json {
 		delChar(b)
 	}
@@ -47,10 +47,11 @@ func GetJsObjectByReader(reader io.Reader) (JsObject, error) {
 
 //根据param得到JsObject中的内容
 //参照Get函数的注释资料
+
 // Get the contents of JsObject according to param
 // Refer to the annotation data of the Get function
 func GetFromJsObject(object JsObject, param string) *Value {
-	params := ParseParam(param)
+	params := parseParam(param)
 	var jso JsObject = object
 	for i, v := range params {
 		if i == len(params) - 1 {
@@ -68,6 +69,7 @@ func GetFromJsObject(object JsObject, param string) *Value {
 //比如以上的json字符串作为[]byte参数
 //“ids.id1”作为param参数
 //得到的结果就是NewVal("1")的指针
+
 // Get the value of Value according to the para parameter
 // str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\", \"id2\":\"2\"}}"
 // Such as the above json string as a [] byte parameter

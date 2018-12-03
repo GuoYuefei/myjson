@@ -6,48 +6,48 @@ import (
 )
 
 func TestStackAnaly(t *testing.T) {
-	s := NewStackAnaly()
-	if !s.IsEmpty() {
+	s := newStackAnaly()
+	if !s.isEmpty() {
 		t.Error("test err", i)
 	}
-	if s.Pop() != 0 {
+	if s.pop() != 0 {
 		t.Error("test err", i)
 	}
-	s.Push(1)
-	s.Push(2)
-	s.Push(3)
-	if s.Size() != 3 {
+	s.push(1)
+	s.push(2)
+	s.push(3)
+	if s.size() != 3 {
 		t.Error("test err", i)
 	}
-	s.Push(44)
-	if s.Top() != 44 {
-		t.Error("test err", i)
-	}
-
-	if s.Pop() != 44 {
+	s.push(44)
+	if s.front() != 44 {
 		t.Error("test err", i)
 	}
 
-	if s.Size() != 3 {
+	if s.pop() != 44 {
 		t.Error("test err", i)
 	}
 
-	s.Clear()
-	if s.Size() != 0 {
+	if s.size() != 3 {
+		t.Error("test err", i)
+	}
+
+	s.clear()
+	if s.size() != 0 {
 		t.Error("err", i)
 	}
 
-	if !s.IsEmpty() {
+	if !s.isEmpty() {
 		t.Error("err", i)
 	}
-	s.Push(1)
-	s.Push(2)
-	s.Push(3)
-	s.Push(111)
-	for !s.IsEmpty() {
-		fmt.Println(s.Pop())
+	s.push(1)
+	s.push(2)
+	s.push(3)
+	s.push(111)
+	for !s.isEmpty() {
+		fmt.Println(s.pop())
 	}
-	if s.Size() != 0 {
+	if s.size() != 0 {
 		t.Error("err", i)
 	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"myjson"
 	"strings"
 )
 
@@ -24,7 +23,6 @@ func main() {
 	fmt.Println(cap(s), len(s), s)
 	fmt.Println(s[1:2])
 	fmt.Println(int(^uint(0)>>1))
-	fmt.Println(myjson.ParseParam("name.age"))
 	fmt.Println(strings.SplitAfter("{    \"name\"  :\"qqq\"  }","\""))
 	dd()
 }

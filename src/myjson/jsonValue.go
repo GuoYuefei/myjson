@@ -6,6 +6,7 @@ import (
 
 //json是js的对象的序列化
 //值应该与js对应
+
 // js.string = go.string
 // js.number = go.float64...
 // js.null = go.nil
@@ -47,6 +48,7 @@ func (v *Value) IsString() bool {
 }
 
 //赋值一个string变量
+
 //Receive a parameter of type string
 //The variable v will be assigned the value of the parameter
 func (v *Value) SetAsString(value string) {
@@ -54,6 +56,7 @@ func (v *Value) SetAsString(value string) {
 }
 
 //值作为string返回，因为可能存在该值不是string的情况，所以第二个返回值用于返回是否发生错误
+
 // The value is returned as a string, because there may be cases where the value is not a string,
 // so the second return value is used to return whether an error has occurred.
 func (v *Value) GetAsString() (string, error) {
@@ -65,6 +68,7 @@ func (v *Value) GetAsString() (string, error) {
 
 //值作为string类型返回，并且忽略错误的发生。若发生错误则返回空字符串
 //这个方法是为了方便连续调用
+
 // The value is returned as a string type and the occurrence of the error is ignored. Return an empty string if an error occurs
 // This method is to facilitate continuous calls
 func (v *Value) GetAsStringIgnore() string {
@@ -90,6 +94,7 @@ func (v *Value) IsNumber() bool {
 
 //返回类型Number的具体类型，当值v不是Number类型的时候返回第二个返回值返回false，否则第二返回值返回true
 //第一个返回值返回该具体数字类型
+
 // Returns the specific type of the type Number, when the value v is not the Number type,
 // return the second return value returns false, otherwise the second return value returns true
 // The first return value returns the specific number type
@@ -120,6 +125,7 @@ func (v *Value) WhichNumType() (NumberType, bool) {
 }
 
 //参数是需要判定的类型，如果参数所提供的类型就是值v的类型则返回true，否则返回false
+
 // The parameter is provided with a type tag,
 // Return true if the type provided by the argument is the type of the value v, otherwise return false
 func (v *Value) IsWhichNumType(numberType NumberType) bool {
@@ -373,6 +379,16 @@ func (v *Value) GetAsBool() (result bool, err error) {
 	return false, errors.New("can not get a bool type")
 }
 
+// A dangerous function,
+// try to use the IsBool function before using this function.
+func (v *Value) GetAsBoolIgnore() (result bool) {
+	if a, ok := v.value.(bool); ok {
+		return a
+	}
+	//很危险的一个函数
+	panic(errors.New("can not get a bool type"))
+}
+
 // set the value v to b
 func (v *Value) SetAsBool(b bool) {
 	if b {
@@ -421,11 +437,11 @@ func (v *Value) GetAsObjectIgnore() JsObject {
 	return nil
 }
 
-//end of Object
+// end of Object
 
-//begin Array = Slice
-//Determine whether v represents a variable of type Slice
-//Return true if it is a Slice type, otherwise return false
+// begin Array = Slice
+// Determine whether v represents a variable of type Slice
+// Return true if it is a Slice type, otherwise return false
 func (v *Value) IsSlice() bool {
 	_, ok := v.value.([]*Value)
 	return ok

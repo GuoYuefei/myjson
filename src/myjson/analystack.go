@@ -13,24 +13,24 @@ import (
 
 //只针对byte的Stack  接口名中的S代表string
 //定义了一个基础栈需要的方法
-type StackSer interface {
+type stackSer interface {
 	//移除并取得栈顶元素
-	Pop() byte
+	pop() byte
 	//只取得栈顶元素
-	Top() byte
+	front() byte
 	//压入栈
-	Push(b byte)
+	push(b byte)
 	//清空栈
-	Clear()
+	clear()
 	//是否为空 空返回true，否则返回false
-	IsEmpty() bool
+	isEmpty() bool
 	//获取栈中元素的个数
-	Size() int
+	size() int
 }
 
 
 
-type StackAnaly struct {
+type stackAnaly struct {
 	//数据所在容器
 	data []byte
 	//top元素所在地的指针
@@ -48,25 +48,25 @@ type StackAnaly struct {
 //忽然发现还需要一个value栈，写在后面了，嗯，重复代码就重复了吧。这里我还是比较想追求一个效率的
 //其实有办法可以减少代码量，但是函数调用太多了，byte栈是经常在用的，所以不好牺牲效率
 
-func NewStackAnaly() *StackAnaly {
+func newStackAnaly() *stackAnaly {
 	//起初的byte先放50个，以后看情况定吧
-	return NewStackAnalyByStack(NewStack())
+	return newStackAnalyByStack(NewStack())
 }
 
-func NewStackAnalyByStack(s *Stack) *StackAnaly {
-	return &StackAnaly{make([]byte, 0, 35), -1, 0, s}
+func newStackAnalyByStack(s *Stack) *stackAnaly {
+	return &stackAnaly{make([]byte, 0, 35), -1, 0, s}
 }
 
 //实现StackSer的过程
-func (s *StackAnaly) IsEmpty() bool {
+func (s *stackAnaly) isEmpty() bool {
 	if s.top < 0 {
 		return true
 	}
 	return false
 }
 
-func (s *StackAnaly) Push(b byte) {
-	s.PushWithoutCheck(b)
+func (s *stackAnaly) push(b byte) {
+	s.pushWithoutCheck(b)
 	switch b {
 	case '"':
 		//fmt.Println("wo jin lai le 0")
@@ -79,7 +79,7 @@ func (s *StackAnaly) Push(b byte) {
 	//fmt.Println(s.IsSign())
 }
 
-func (s *StackAnaly) PushWithoutCheck(b byte) {
+func (s *stackAnaly) pushWithoutCheck(b byte) {
 	//其实就是len > top+1
 	//因为存在pop了，但没删除的情况
 	s.top++			//先自加后可以省略两个加法运算
@@ -89,16 +89,16 @@ func (s *StackAnaly) PushWithoutCheck(b byte) {
 	s.data = append(s.data, b)
 }
 
-func (s *StackAnaly) Pop() byte {
+func (s *stackAnaly) pop() byte {
 	//当s。state中栈顶不是数组了，就置空标志位
 	if s.State.GetOOA() {
 		s.flag = s.flag & 0x7F
 	}
-	return s.PopWithoutCheck()
+	return s.popWithoutCheck()
 }
 
 //标志位暂且没有作用，这个PopN也写成不会withoutCheck的
-func (s *StackAnaly) PopN(n int) []byte {
+func (s *stackAnaly) popN(n int) []byte {
 	if s.top >= n-1 && n > 0{
 		result := s.data[s.top-n+1:s.top+1]
 		s.top = s.top - n
@@ -107,8 +107,8 @@ func (s *StackAnaly) PopN(n int) []byte {
 	panic("PopN: top < n-1")
 }
 
-func (s *StackAnaly) PopWithoutCheck() byte {
-	if s.IsEmpty() {
+func (s *stackAnaly) popWithoutCheck() byte {
+	if s.isEmpty() {
 		fmt.Errorf("栈为空！！" )
 		return 0
 	}
@@ -118,7 +118,7 @@ func (s *StackAnaly) PopWithoutCheck() byte {
 }
 
 //从栈顶删除元素，在不需要元素返回的时候可以调用这个函数，效率快
-func (s *StackAnaly) DeleteN(n int) {
+func (s *stackAnaly) deleteN(n int) {
 	if s.top >= n-1 {
 		s.top = s.top - n
 		return
@@ -126,19 +126,19 @@ func (s *StackAnaly) DeleteN(n int) {
 	panic("DeleteN: top < n-1")
 }
 
-func (s *StackAnaly) Top() byte {
-	if s.IsEmpty() {
+func (s *stackAnaly) front() byte {
+	if s.isEmpty() {
 		fmt.Errorf("栈为空！" )
 		return 0
 	}
 	return s.data[s.top]
 }
 
-func (s *StackAnaly) Size() int {
+func (s *stackAnaly) size() int {
 	return s.top + 1
 }
 
-func (s *StackAnaly) Clear() {
+func (s *stackAnaly) clear() {
 	s.top = -1
 	s.State.Clear()
 	s.flag = 0x00
@@ -146,26 +146,26 @@ func (s *StackAnaly) Clear() {
 
 //-----------------接下来需要考虑为这个栈增添什么功能-----------
 
-type StackAnalyser interface {
-	StackSer
-	Analyser
+type stackAnalyser interface {
+	stackSer
+	analyser
 }
 
 //栈的分析接口
-type Analyser interface {
-	IsSign() WhatsType
-	SetFlag(b byte)
-	GetFlag() byte
+type analyser interface {
+	isSign() WhatsType
+	setFlag(b byte)
+	getFlag() byte
 }
 //需要分析出标志符{}[],":七个
 
 //查看刚压入的元素是否是标识符 如果是就返回有值的sign，否则就nil
-func (s *StackAnaly) IsSign() WhatsType {
+func (s *stackAnaly) isSign() WhatsType {
 	//return GetSign([]byte{s.Top()}, s.flag)
-	return s.IsSignN(0)
+	return s.isSignN(0)
 }
 
-func (s *StackAnaly) IsSignN(n int) (wt WhatsType) {
+func (s *stackAnaly) isSignN(n int) (wt WhatsType) {
 	switch s.data[s.top-n] {
 	//出现频率应该是最高的放在前面
 	case ',':
@@ -189,12 +189,12 @@ func (s *StackAnaly) IsSignN(n int) (wt WhatsType) {
 }
 
 //置位标识符 使用位
-func (s *StackAnaly) SetFlag(b byte) {
+func (s *stackAnaly) setFlag(b byte) {
 	s.flag = b
 }
 
 //得到标志位
-func (s *StackAnaly) GetFlag() byte {
+func (s *stackAnaly) getFlag() byte {
 	return s.flag
 }
 
@@ -218,6 +218,9 @@ type StackValuer interface {
 
 //这个类似一个万能的栈了
 //主要用来存放js对象和数组的
+
+// This is a stack that can store any type
+// Depends on the Value type
 type Stack struct {
 	//可能也会放key的哦
 	data []*Value
@@ -228,6 +231,7 @@ type Stack struct {
 	obOrAr bool
 }
 
+// New a Stack
 func NewStack() *Stack {
 	return &Stack{make([]*Value, 0, NumLayer), -1, true}
 }
@@ -293,38 +297,40 @@ func (s *Stack) Clear() {
 	s.obOrAr = true
 }
 
+// If it is judged whether the Value type that Push enters represents this array or an object,
+// the default is the object.
 func (s *Stack) GetOOA() bool {
 	return s.obOrAr
 }
 
 
-type StackStringer interface {
-	IsEmpty() bool
-	Push(s string)
-	Pop() string
-	Top() string
-	Clear()
-	Size() int
+type stackStringer interface {
+	isEmpty() bool
+	push(s string)
+	pop() string
+	front() string
+	clear()
+	size() int
 }
 
-//不管了，我在写一个string的栈吧，这样执行速度上将比上面的更加快写
-type StackString struct {
+// 不管了，我在写一个string的栈吧，这样执行速度上将比上面的更加快写
+type stackString struct {
 	data []string
 	top int
 }
 
-func NewStackString() *StackString {
-	return &StackString{make([]string, 0, NumLayer), -1}
+func newStackString() *stackString {
+	return &stackString{make([]string, 0, NumLayer), -1}
 }
 
-func (s *StackString)IsEmpty() bool {
+func (s *stackString)isEmpty() bool {
 	if s.top == -1 {
 		return true
 	}
 	return false
 }
 
-func (s *StackString) Push(v string) {
+func (s *stackString) push(v string) {
 	s.top++
 	if len(s.data) > s.top {
 		s.data[s.top] = v
@@ -333,8 +339,8 @@ func (s *StackString) Push(v string) {
 	}
 }
 
-func (s *StackString) Pop() string {
-	if s.IsEmpty() {
+func (s *stackString) pop() string {
+	if s.isEmpty() {
 		return ""
 	}
 	v := s.data[s.top]
@@ -342,18 +348,18 @@ func (s *StackString) Pop() string {
 	return v
 }
 
-func (s *StackString) Top() string {
-	if s.IsEmpty() {
+func (s *stackString) front() string {
+	if s.isEmpty() {
 		return ""
 	}
 	return s.data[s.top]
 }
 
-func (s *StackString) Size() int {
+func (s *stackString) size() int {
 	return s.top + 1
 }
 
-func (s *StackString) Clear() {
+func (s *stackString) clear() {
 	s.top = -1
 }
 

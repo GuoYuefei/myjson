@@ -38,6 +38,8 @@ func checkNTFN(str string) (NumberType, *Value){
 	}
 }
 
+// 确定是bool还是null还是数字类型
+// NBN NULL Bool Number
 func checkNBN(bs []byte) (NumberType, *Value) {
 	if bytes.EqualFold(bs,[]byte{'t','r','u','e'}) {
 		return Bool, NewVal(true)
@@ -67,17 +69,17 @@ func checkNBN(bs []byte) (NumberType, *Value) {
 //处理value的值，将value按照不同情况识别，
 //并按照其情况处理value的去向问题
 //这个只处理非容器Value
-func putValue(sa *StackAnaly,value *Value) {
-	sign := sa.IsSign()
+func putValue(sa *stackAnaly,value *Value) {
+	sign := sa.isSign()
 	if sign == TColon {
 		//value是对象里的值
 		//这里是冒号情况下value的情况，需要让：出栈
 		if sa.State.GetOOA() {
 			//其实一定在对象里的，冒号是不会在数组里出现的
-			sa.State.Top().GetAsObjectIgnore()[keyStrs.Pop()] = value
+			sa.State.Top().GetAsObjectIgnore()[keyStrs.pop()] = value
 		}
 		//sa.Pop() //冒号pop出来
-		sa.DeleteN(1)			// Pop -> DeleteN 注释同上
+		sa.deleteN(1)			// Pop -> deleteN 注释同上
 	} else if sign == TComma && !sa.State.GetOOA() {
 		//value是作为数组中的元素的
 		//不在对象中的逗号
@@ -91,7 +93,7 @@ func putValue(sa *StackAnaly,value *Value) {
 
 
 		//sa.Pop() //逗号pop出来
-		sa.DeleteN(1)			//Pop -> DeleteN 注释同上
+		sa.deleteN(1)			//Pop -> deleteN 注释同上
 	} else if sign == TSquareL {
 		//value是数组的第一个元素
 		//a := sa.State.Pop().GetAsSliceIgnore()
@@ -107,6 +109,8 @@ func putValue(sa *StackAnaly,value *Value) {
 }
 
 //高效版压缩json
+
+// Compress json
 func CompressJson(bs []byte) []byte {
 	//四个代替法则
 	rp := strings.NewReplacer("\t", "",
@@ -116,19 +120,20 @@ func CompressJson(bs []byte) []byte {
 	return []byte(rp.Replace(string(bs)))
 }
 
-//还没有完成，将来肯定需要的函数
-func FormatJson(bs []byte) []byte {
-	str := string(bs)
-	//做一些format的事情
-
-	return []byte(str)
-}
+////还没有完成，将来肯定需要的函数
+//func FormatJson(bs []byte) []byte {
+//	str := string(bs)
+//	//做一些format的事情
+//
+//	return []byte(str)
+//}
 
 //分析参数用的
 ////str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\",\"id2\":\"2\"}}"
 //以上的形成的js对象，param 为 name时得到的是以“gyf”为包装的*Value值   ids.id1 就是 “1”的*Value
 //所以这里主要是将param字符串中的内容以”.“为分割 分割成string切片返回
-func ParseParam(param string) []string {
+// Analysis parameters used
+func parseParam(param string) []string {
 	return strings.Split(param, ".")
 }
 

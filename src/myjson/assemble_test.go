@@ -22,10 +22,10 @@ func TestAssemble1(t *testing.T) {
 	//这里可以发现应该是ids的地方变成了id2 //ps已修复
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["ids"].GetAsObjectIgnore()["id1"].GetAsStringIgnore())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["name"].GetAsStringIgnore())
-	fmt.Println(s.Size(),len(str1))
+	fmt.Println(s.size(),len(str1))
 	//fmt.Println(s.Pop(),s.Pop(),s.Pop(),s.Pop(),s.Pop())			//{--123  }--125没单出s 58--:
 	//s.Push([]byte("\"")[0])
-	//fmt.Println(s.GetFlag() & 0x40)
+	//fmt.Println(s.getFlag() & 0x40)
 	//delChar([]byte("{")[0])
 	//delChar([]byte("\"")[0])
 }
@@ -43,7 +43,7 @@ func TestAssemble2(t *testing.T) {
 	fmt.Println(s.State.Top().GetAsObjectIgnore())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["ids"].GetAsSliceIgnore()[0].GetAsStringIgnore())
 
-	fmt.Println(s.data,s.Size(),len(str2))
+	fmt.Println(s.data,s.size(),len(str2))
 }
 
 func TestAssemble3(t *testing.T) {
@@ -57,7 +57,7 @@ func TestAssemble3(t *testing.T) {
 	}
 	fmt.Println(s.State.Top().GetAsObjectIgnore())
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["age"].GetAsInt())
-	fmt.Println(s.data,s.Size(),len(str3))
+	fmt.Println(s.data,s.size(),len(str3))
 	v, err := s.State.Top().GetAsObjectIgnore()["sex"].GetAsBool()
 	if err != nil {
 		t.Error(err)
@@ -91,9 +91,7 @@ func TestAssembleFile(t *testing.T) {
 	fmt.Println("key12 = ", s.State.Top().GetAsObjectIgnore()["key12"].GetAsSliceIgnore()[0].GetAsObjectIgnore()["key13"].GetAsIntIgnore())
 
 	fmt.Println(s.State.Top().GetAsObjectIgnore()["key6"].GetAsObjectIgnore()["key8"].GetAsObjectIgnore()["key9"].GetAsStringIgnore())
-	fmt.Println(s.data,s.Size(),len(string(bs)))
-	//fmt.Println(ss.data,s.Size())
-	fmt.Println(keyStrs.data,keyStrs.Size())
-	fmt.Println(sState.data,sState.Size())
-	//fmt.Println(s.State.data,s.State.Size())
+	fmt.Println(s.data,s.size(),len(string(bs)))
+	fmt.Println(sState.data,s.size())
+	fmt.Println(keyStrs.data,keyStrs.size())
 }

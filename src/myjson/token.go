@@ -45,7 +45,8 @@ func (s *sign) getWT() WhatsType {
 
 //根据sign这个字符来判定是否是Sign类型，返回与标志符想对应的*Sign
 //StaNone最终会是继承上一个期待的,
-func GetSign(b byte) *sign {
+//！！！废弃
+func getSign(b byte) *sign {
 	var s *sign
 	switch b {
 	//出现频率应该是最高的放在前面
