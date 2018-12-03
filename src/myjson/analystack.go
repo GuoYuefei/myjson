@@ -71,8 +71,10 @@ func (s *StackAnaly) Push(b byte) {
 	case '"':
 		//fmt.Println("wo jin lai le 0")
 		s.flag = s.flag ^ 0x40			//每次压入一个"时，第二位标志位取反
-	case '[':
-		s.flag = s.flag | 0x80			//[设标志位
+
+		//发现这并没用到
+	//case '[':
+	//	s.flag = s.flag | 0x80			//[设标志位
 	}
 	//fmt.Println(s.IsSign())
 }

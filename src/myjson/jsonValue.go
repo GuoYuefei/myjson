@@ -457,7 +457,7 @@ func (v *Value) GetAsSliceIgnore() Slice {
 }
 
 //用于更新Slice
-func (v *Value) UpdateSlice(vv ...*Value) {
+func (v *Value) AppendSlice(vv ...*Value) {
 	if sv, ok := v.value.(Slice); ok {
 		sv = append(sv, vv...)
 		v.value = sv

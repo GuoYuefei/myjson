@@ -87,7 +87,7 @@ func putValue(sa *StackAnaly,value *Value) {
 		//sa.State.Push(NewVal(a))
 
 		a := sa.State.data[sa.State.top]
-		a.UpdateSlice(value)
+		a.AppendSlice(value)
 
 
 		//sa.Pop() //逗号pop出来
@@ -99,7 +99,7 @@ func putValue(sa *StackAnaly,value *Value) {
 		//sa.State.Push(NewVal(a))
 
 		a := sa.State.data[sa.State.top]
-		a.UpdateSlice(value)
+		a.AppendSlice(value)
 
 
 		//不用pop，[号是匹配符号

@@ -76,7 +76,6 @@ func delChar(b byte) {
 
 		v := s.PopWithoutCheck()
 
-
 		//这个时候我们确定这里的值就是number，true，false，null了
 		//当s.IsSign.GetWT ！= TNone就认为value结束了，下一个肯定是标志符了
 		//for s.IsSign().GetWT() == TNone {
@@ -107,10 +106,9 @@ func delChar(b byte) {
 	//如果是引号的话
 	//且栈的状态标志在string档位，所以所有的字符进来全是string的一部分
 	if sign == TQuotation && s.GetFlag() & 0x40 == 0x00 {
-
 		//如果接收到下一个引号了,那么就标志着一个字符串的结束
 		//因为第二位标志符号会在第二个”引号来的时候重置
-		var tempStr = ""
+
 		s.DeleteN(1)			//右引号删除
 		//在没有碰到左引号时认为都是字符串里的东西
 		//for s.IsSign().GetWT() != TQuotation {
@@ -124,7 +122,7 @@ func delChar(b byte) {
 		//!!!修改，该代码代替上面两个循环的注释代码
 		var i int
 		for i = 0; s.IsSignN(i) != TQuotation; i++ {}
-		tempStr = string(s.PopN(i))
+		tempStr := string(s.PopN(i))
 
 
 		s.DeleteN(1)		//pop -> DeleteN 删除左引号
@@ -182,12 +180,9 @@ KEYWORD2:
 				return
 			}
 			jsob := sState.Pop().GetAsObjectIgnore()
-			//s.Pop()				//} pop出来
-			//s.Pop()				//: or ,  pop出来，属性前面肯定有冒号啊
-			//s.Pop()				//{ pop出来
-
 
 			if sState.GetOOA() {
+				//对象中的对象需要pop出}{：
 				s.DeleteN(3)
 				sState.Top().GetAsObjectIgnore()[keyStrs.Pop()] = NewVal(jsob)
 			} else {
@@ -195,11 +190,12 @@ KEYWORD2:
 				//arr = append(arr, NewVal(jsob))
 				//sState.Push(NewVal(arr))
 
+				//数组中的对象只需要pop出}{
 				s.DeleteN(2)			//注释同上 ，修改 pop -> DeleteN		DeleteN的速度更快
 
 				//!!替换以上代码，更新切片是Value类型应该做的事情
 				arr := sState.data[sState.top]
-				arr.UpdateSlice(NewVal(jsob))
+				arr.AppendSlice(NewVal(jsob))
 			}
 		}
 		return
@@ -231,7 +227,7 @@ KEYWORD2:
 
 				//！！！替换以上代码
 				temp := sState.data[sState.top]
-				temp.UpdateSlice(NewVal(arr))
+				temp.AppendSlice(NewVal(arr))
 			}
 		}
 	}
