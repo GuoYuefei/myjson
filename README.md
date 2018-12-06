@@ -1,8 +1,14 @@
 
 
-![MYJSON](logo.png)
-
-[![GoDoc](https://godoc.org/github.com/GuoYuefei/myjson/src/myjson?status.svg)](https://godoc.org/github.com/GuoYuefei/myjson/src/myjson)
+<p align="center">
+<img 
+    src="logo.png" 
+    width="286" height="263" border="0" alt="MYJSON"/>
+    <br/>
+<a href="https://godoc.org/github.com/GuoYuefei/myjson/src/myjson">
+    <img src="https://godoc.org/github.com/GuoYuefei/myjson/src/myjson?status.svg" 		alt="GoDoc">
+</a>
+</p>
 
 
 MYJSON is a Go package that provides a fast and simple way to get values from a json document.
