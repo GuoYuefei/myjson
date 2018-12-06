@@ -12,8 +12,8 @@ import (
 //基础函数，底层函数，也比较好用
 //根据字节数组解析成相应的JsObject，成功error就返回nil，否则返回相应错误
 
-// Basic functions, the underlying functions, also easier to use
-// According to the byte array parsed into the corresponding JsObject, if successful, the return value of error is nil, otherwise return the corresponding error
+// GetJsObject Basic functions, the underlying functions, also easier to use.
+// According to the byte array parsed into the corresponding JsObject, if successful, the return value of error is nil, otherwise return the corresponding error.
 func GetJsObject(json []byte) (JsObject, error) {
 	clearAllStack()
 
@@ -23,11 +23,11 @@ func GetJsObject(json []byte) (JsObject, error) {
 	return sState.Top().GetAsObject()
 }
 
-// Get Js object according to bufio.Reader
-// Return situation is the same as func GetJsObject
+// GetJsObjectByBufReader Get Js object according to bufio.Reader.
+// Return situation is the same as func GetJsObject.
 func GetJsObjectByBufReader(reader *bufio.Reader) (JsObject, error) {
-	p := make([]byte, 16)			//每次取16字节数据
-	json := make([]byte, 0, 112)
+	p := make([]byte, 32)			//每次取32字节数据
+	json := make([]byte, 0, 224)
 	for {
 		n, err := reader.Read(p)
 		json = append(json, p[:n]...)
@@ -38,8 +38,8 @@ func GetJsObjectByBufReader(reader *bufio.Reader) (JsObject, error) {
 	return GetJsObject(json)
 }
 
-// Get Js Object according to io.Reader
-// Return situation is the same as func GetJsObject
+// GetJsObjectByReader Get Js Object according to io.Reader.
+// Return situation is the same as func GetJsObject.
 func GetJsObjectByReader(reader io.Reader) (JsObject, error) {
 	bufReader := bufio.NewReader(reader)
 	return GetJsObjectByBufReader(bufReader)
@@ -48,8 +48,8 @@ func GetJsObjectByReader(reader io.Reader) (JsObject, error) {
 //根据param得到JsObject中的内容
 //参照Get函数的注释资料
 
-// Get the contents of JsObject according to param
-// Refer to the annotation data of the Get function
+// GetFromJsObject Get the contents of JsObject according to param.
+// Refer to the annotation data of the Get function.
 func GetFromJsObject(object JsObject, param string) *Value {
 	params := parseParam(param)
 	var jso JsObject = object
@@ -70,11 +70,11 @@ func GetFromJsObject(object JsObject, param string) *Value {
 //“ids.id1”作为param参数
 //得到的结果就是NewVal("1")的指针
 
-// Get the value of Value according to the para parameter
-// str1 := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\", \"id2\":\"2\"}}"
-// Such as the above json string as a [] byte parameter
-// "ids.id1" as the param parameter
-// The result is a pointer to NewVal("1")
+// Get Get the value of Value according to the para parameter,
+// para := "{\"name\":\"gyf\",\"age\":\"12\",\"ids\":{\"id1\":\"1\", \"id2\":\"2\"}}",
+// Such as the above json string as a [] byte parameter,
+// "ids.id1" as the param parameter,
+// The result is a pointer to NewVal("1").
 // If you need to get the final result, just refer to the Document of the Value type.
 func Get(json []byte, param string) *Value{
 	object, e := GetJsObject(json)

@@ -59,7 +59,7 @@ func BenchmarkTestGetJsObjectMid(b *testing.B) {
 	//bytes = myjson.CompressJson(bytes)
 	var object myjson.JsObject = make(myjson.JsObject)
 	for i := 0; i < b.N; i++ {
-		object, _ = myjson.GetJsObject(bytes)
+		object, e = myjson.GetJsObject(bytes)
 		if e != nil {
 			b.Error("测试函数失败")
 		}

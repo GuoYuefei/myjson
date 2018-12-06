@@ -3,9 +3,12 @@ package myjson
 
 
 //------------一些设置常量---------------
-const NumLayer int = 4				//一般不会超过四层嵌套，节约内存
+
+//
+const numLayer int = 4 //一般不会超过NumLayer层嵌套，节约内存
 
 //----------这个是jsonValue.go需要定义的简单结构---------------
+
 type NumberType int
 
 //Array, Object, True, False as a special number type
@@ -22,12 +25,22 @@ const (
 	Str
 )
 
-// Define an alias, this type is a js object, in fact, is what the js object should look like
+// JsObject
+// Define an alias, this type is a js object, in fact, is what the js object should look like.
 // There is a point to determine that the value of the map must be of type Value. In fact,
 // you can think of this type as a recursive structure.
-type JsObject = map[string]*Value
+type JsObject  map[string]*Value
 
-// There is a point to determine that the data in the slice must be of type Value
+// 序列话完成后写
+//func (jso *JsObject)String() string {
+//
+//}
+
+
+
+
+// Slice
+// There is a point to determine that the data in the slice must be of type Value.
 // it can be thought of as a recursive structure.
 type Slice = []*Value
 
@@ -54,6 +67,7 @@ type Slice = []*Value
 
 
 
+// WhatsType
 // As a unique identifier for a keyword, you can distinguish {}[]:,"
 type WhatsType = int
 const (

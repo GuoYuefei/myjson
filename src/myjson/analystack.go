@@ -1,7 +1,7 @@
 package myjson
 
 import (
-	"fmt"
+	"errors"
 )
 
 //这是一个分析栈，json其实就是在分析一个一个的字符
@@ -54,7 +54,7 @@ func newStackAnaly() *stackAnaly {
 }
 
 func newStackAnalyByStack(s *Stack) *stackAnaly {
-	return &stackAnaly{make([]byte, 0, 35), -1, 0, s}
+	return &stackAnaly{make([]byte, 24), -1, 0, s}
 }
 
 //实现StackSer的过程
@@ -66,7 +66,13 @@ func (s *stackAnaly) isEmpty() bool {
 }
 
 func (s *stackAnaly) push(b byte) {
-	s.pushWithoutCheck(b)
+	//其实就是len > top+1
+	//因为存在pop了，但没删除的情况
+	s.top++			//先自加后可以省略两个加法运算
+	if len(s.data) != s.top {
+		s.data[s.top] = b
+	}
+	s.data = append(s.data, b)
 	switch b {
 	case '"':
 		//fmt.Println("wo jin lai le 0")
@@ -109,8 +115,7 @@ func (s *stackAnaly) popN(n int) []byte {
 
 func (s *stackAnaly) popWithoutCheck() byte {
 	if s.isEmpty() {
-		fmt.Errorf("栈为空！！" )
-		return 0
+		panic(errors.New("s.popWithoutCheck err. s is empty!"))
 	}
 	b := s.data[s.top]
 	s.top--
@@ -128,7 +133,7 @@ func (s *stackAnaly) deleteN(n int) {
 
 func (s *stackAnaly) front() byte {
 	if s.isEmpty() {
-		fmt.Errorf("栈为空！" )
+		panic(errors.New("s.front err. s is empty!"))
 		return 0
 	}
 	return s.data[s.top]
@@ -170,16 +175,16 @@ func (s *stackAnaly) isSignN(n int) (wt WhatsType) {
 	//出现频率应该是最高的放在前面
 	case ',':
 		wt = TComma
-	case ':':
-		wt = TColon
 	case '"':
 		wt = TQuotation
+	case ':':
+		wt = TColon
 	case '{':
 		wt = TBracesL
-	case '[':
-		wt = TSquareL
 	case '}':
 		wt = TBracesR
+	case '[':
+		wt = TSquareL
 	case ']':
 		wt = TSquareR
 	default:
@@ -219,8 +224,9 @@ type StackValuer interface {
 //这个类似一个万能的栈了
 //主要用来存放js对象和数组的
 
-// This is a stack that can store any type
-// Depends on the Value type
+// Stack
+// This is a stack that can store any type.
+// Depends on the Value type.
 type Stack struct {
 	//可能也会放key的哦
 	data []*Value
@@ -231,9 +237,10 @@ type Stack struct {
 	obOrAr bool
 }
 
-// New a Stack
+// NewStack
+// New a Stack.
 func NewStack() *Stack {
-	return &Stack{make([]*Value, 0, NumLayer), -1, true}
+	return &Stack{make([]*Value, 0, numLayer), -1, true}
 }
 
 
@@ -297,6 +304,7 @@ func (s *Stack) Clear() {
 	s.obOrAr = true
 }
 
+// GetOOA
 // If it is judged whether the Value type that Push enters represents this array or an object,
 // the default is the object.
 func (s *Stack) GetOOA() bool {
@@ -320,7 +328,7 @@ type stackString struct {
 }
 
 func newStackString() *stackString {
-	return &stackString{make([]string, 0, NumLayer), -1}
+	return &stackString{make([]string, numLayer), -1}
 }
 
 func (s *stackString)isEmpty() bool {

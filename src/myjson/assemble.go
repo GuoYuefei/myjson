@@ -44,7 +44,7 @@ func init() {
 //这个函数只负责处理keyWord
 func delChar(b byte) {
 	//不在字符串状态下的空格换行等等字符不判定，不压栈
-	if s.getFlag()&0x40 == 0x00 && (b == ' ' || b == '\n' || b == '\t' || b == '\r') {
+	if s.flag&0x40 == 0x00 && (b == ' ' || b == '\n' || b == '\t' || b == '\r') {
 		return
 	}
 	s.push(b)
@@ -52,14 +52,12 @@ func delChar(b byte) {
 	sign := s.isSign()
 
 	//字符串或者不是标识符时，直接退出函数				en...冒号暂且也没有特殊的事件判断，故而省略
-	if sign == TNone  || s.getFlag()&0x40 == 0x40 || sign == TColon {
+	if sign == TNone  || sign == TColon || s.flag&0x40 == 0x40  {
 		return
 	}
 
-
-
 	/**
-	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的s.isSign().GetWT == TNone
+	1、判定number、bool、null的方式无非就是在遇到 “, } ]”这三个符号的时候的前面一位的Sign == TNone
 	2、对应的判定这些结束的标志是： ， [
 	 */
 	if (sign == TComma || sign == TBracesR || sign == TSquareR) && s.isSignN(1) == TNone {
@@ -94,7 +92,7 @@ func delChar(b byte) {
 		for i = 0; s.isSignN(i) == TNone; i++ {}
 		temp := s.popN(i)
 
-		_, value := checkNBN(temp)
+		value := checkNBN(temp)
 		putValue(s, value)
 		s.pushWithoutCheck(v)  		//还原} ] ,
 		goto KEYWORD2			//如果是] }那么还需要处理
@@ -105,7 +103,7 @@ func delChar(b byte) {
 
 	//如果是引号的话
 	//且栈的状态标志在string档位，所以所有的字符进来全是string的一部分
-	if sign == TQuotation && s.getFlag() & 0x40 == 0x00 {
+	if sign == TQuotation && s.flag&0x40 == 0x00 {
 		//如果接收到下一个引号了,那么就标志着一个字符串的结束
 		//因为第二位标志符号会在第二个”引号来的时候重置
 
@@ -165,14 +163,14 @@ KEYWORD2:
 		//当开始一个左中括号的时候，接下来的内容在一个数组里面
 		//fmt.Println(string([]byte{s.Top()}))
 		//当栈顶为[的时候，接下来的东西在数组中
-		array := make([]*Value,0,10)
+		array := make(Slice,0,5)
 		sState.Push(NewVal(array))
 		return
 	}
 
 	if sign == TBracesR {
 		//其实下面的判断一定是成立的，暂且找不出不成立的理由
-		if sState.GetOOA() {
+		//if sState.GetOOA() {
 			if sState.Size() == 1 {
 				//只剩下最后一个对象了，不就是json全解析完了嘛。。哈哈
 				//s.Pop();s.Pop();		//最后两个{}pop出来
@@ -197,14 +195,14 @@ KEYWORD2:
 				arr := sState.data[sState.top]
 				arr.AppendSlice(NewVal(jsob))
 			}
-		}
+		//}
 		return
 	}
 
 	if sign == TSquareR {
 		//也一定成立的
 		//fmt.Println(string([]byte{s.Top()}))
-		if !sState.GetOOA() {
+		//if !sState.GetOOA() {
 			arr := sState.Pop().GetAsSliceIgnore()
 			//s.Pop()   			//]pop
 			s.deleteN(1)			//注释同上 Pop -> deleteN
@@ -229,7 +227,7 @@ KEYWORD2:
 				temp := sState.data[sState.top]
 				temp.AppendSlice(NewVal(arr))
 			}
-		}
+		//}
 	}
 	return
 }
